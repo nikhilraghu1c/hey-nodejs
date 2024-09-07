@@ -43,3 +43,36 @@ Just to learn the nodejs all concepts
     * @requires module_name - The name of the module or file to be loaded.
     * @returns {Object} - The loaded module or file.
     * @throws {Error} - If the module or file cannot be found or loaded.
+
+
+# CJS vs MJS
+
+- **CJS (CommonJS)**
+  - By default Used in Node.js or type in package.json will be commonjs.
+  - Synchronous module loading.
+  - Uses `require()` to import modules.
+  - Uses `module.exports` to export modules.
+  - Example:
+    ```javascript
+    // Importing a module
+    const module = require('module_name');
+
+    // Exporting a module
+    module.exports = {
+      functionName,
+      variableName
+    };
+    ```
+
+- **MJS (ES Modules)**
+  - Used in modern JavaScript (ES6+) or type in package.json will be module.
+  - Asynchronous module loading.
+  - Uses `import` to import modules & Uses `export` to export modules.
+  - Example:
+    ```javascript
+    // Importing a module
+    import { functionName, variableName } from 'module_name';
+
+    // Exporting a module
+    export const functionName = () => { ... };
+    export const variableName = 'value';
