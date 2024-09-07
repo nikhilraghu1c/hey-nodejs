@@ -20,9 +20,26 @@ Just to learn the nodejs all concepts
 - 'node' - command to use to create JS runtime environment (Behind scene it will use V8 engine to execute JS)
            It is very similar to browser console
 
-# GLobal Object
+# Global Object
 
 - In browser (this, self, frames ) referes to window (global object)
 - In NodeJS - Global object is (global) and (this) refers to blank object
 - globalThis - New Global object, Standard conviction for all browser and JS Run time Environment
 - In NodeJS - globalThis === global (which is true). 
+
+# Module & Require
+
+- Node.js modules are reusable pieces of code that encapsulate related functionality and can be imported and used in other parts of a Node.js application
+- They can be imported using the require() function, which allows access to the exported functionality.
+- Modules can be created using the module.exports object to expose functions, objects, or values to other parts of the application.
+- You can access other modules variable and function until unless they are exported
+- By Default Modules are protected.
+- To exports multiple function or variable then you have to wrap it in object
+- Modules can be built-in Node.js modules, third-party modules installed via npm, or custom modules created by the developer.
+- Modules help in separating concerns and promoting maintainability and scalability in Node.js applications.
+- They promote code organization, modularity, and reusability.
+- Require is used to load external modules or files in Node.js.
+- Require provides a way to include external functionality into your application.
+    * @requires module_name - The name of the module or file to be loaded.
+    * @returns {Object} - The loaded module or file.
+    * @throws {Error} - If the module or file cannot be found or loaded.
