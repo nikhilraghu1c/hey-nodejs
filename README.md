@@ -43,6 +43,7 @@ Just to learn the nodejs all concepts
     * @requires module_name - The name of the module or file to be loaded.
     * @returns {Object} - The loaded module or file.
     * @throws {Error} - If the module or file cannot be found or loaded.
+- We can also create a folder with an index.js file in it, which is responsible for exporting all the functions present in multiple files within the folder
 
 
 # CJS vs MJS

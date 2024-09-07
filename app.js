@@ -1,9 +1,11 @@
 require("./xyz");
-const { x, calculateSum } = require("./sum");
+
+const { calculateSum, calculateMultiply } = require("./calculate");
+const data = require("./data");
 
 var a = 10;
 var b = 20;
 
-console.log(x);
-console.log(calculateSum(a, b));
-console.log(globalThis === global); // true
+calculateSum(a, b);
+calculateMultiply(a, b);
+console.log(data);
