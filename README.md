@@ -43,8 +43,23 @@ Just to learn the nodejs all concepts
     * @requires module_name - The name of the module or file to be loaded.
     * @returns {Object} - The loaded module or file.
     * @throws {Error} - If the module or file cannot be found or loaded.
-- We can also create a folder with an index.js file in it, which is responsible for exporting all the functions present in multiple files within the folder
+- We can also create a folder with an index.js file in it, which is responsible for exporting all the functions present in multiple files within the folder.
 
+# How Module and Require Works Internally
+
+- All the code of the module is wrapped inside a function called an IIFE (Immediately Invoked Function Expression), which is a self-executing anonymous function that is used to create a new scope for the module and prevent polluting the global scope.
+  ```javascript
+    (function (exports, require, module, __dirname, __filename) {
+      // code of the module (js files) 
+    })()  
+  ```
+- Different parameter like module, require passed to the function (IIFE) by nodejs & then pass to the V8 Engine.
+- require(path)
+  1. Resolving the path and module (json, js, node:module etc)
+  2. Loads the module (Content according to the file type)
+  3. Wraps inside the IIFE (Compile process)
+  4. Evaluation (module.exports)
+  5. Caching (If any module imports or require into multiple module then nodejs processed and cached it once & uses cached data into another module).
 
 # CJS vs MJS
 
@@ -77,3 +92,4 @@ Just to learn the nodejs all concepts
     // Exporting a module
     export const functionName = () => { ... };
     export const variableName = 'value';
+
