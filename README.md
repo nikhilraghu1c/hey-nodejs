@@ -154,4 +154,24 @@ Just to learn the nodejs all concepts
   - At this point, libuv takes over the major tasks. It handles operations such as processing timers, managing file system calls, and communicating with the operating system.
   - libuv performs these heavy tasks in the background, ensuring that asynchronous operations continue to be managed effectively. In summary, Node.js excels in handling asynchronous I/O operations, thanks to its non-blocking I/O model.
 
+# Sync Async / Blocking Non Blocking Code
+
+  - **fs.readFile("path", encoding, callback)**
+    - Aysnc function which not Block the main thread and JS Engine's transfer it to Libuv to execute.
+    - After reading the file libuv update the JS Engine and execute the callback.
+  
+  - **fs.readFileSync("path", encoding, callback)**
+    - Sync function which Block the main thread until the file is completely read.
+    - It is still transfer to Libuv by JS Engine's to execute because file system task can't be accessible by JS Engine V8.
+    - They don't have callback function because it is blocking the main thread.
+    - As a developer, it’s important to understand that while Node.js and the V8 engine give you the capability to block the main thread using synchronous methods, this is generally not recommended.
+    - Example of sync function like fs.readFileSync(), crypto.pbkdf2Sync() etc.
+
+  - **setTimeout(0)**
+    - Trust Issues with setTimeout(0) : When you ask the code to run after 0 milliseconds, it doesn't necessarily run immediately after that time. It runs only when the call stack of the main thread is empty. This introduces some "terms and conditions," meaning that the actual execution timing is dependent on the state of the call stack.
+    - This means that even if you specify a 0-millisecond delay, the callback will only execute after the global execution context is done.
+
+  *Note* :- UTF-8 (Uniform Transformation Format 8-bit), is a character encoding standard that used for electronic communication. An encoding defines a mapping between bytes and text. Encoding is important as we consider the contents of a file to be in text format. As the utf-8 encoding is most common & covers nearly all characters of human languages, it is necessary to pass it as the options parameter to the fs.readFile().
+
+
 
