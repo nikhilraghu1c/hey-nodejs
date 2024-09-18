@@ -173,5 +173,44 @@ Just to learn the nodejs all concepts
 
   *Note* :- UTF-8 (Uniform Transformation Format 8-bit), is a character encoding standard that used for electronic communication. An encoding defines a mapping between bytes and text. Encoding is important as we consider the contents of a file to be in text format. As the utf-8 encoding is most common & covers nearly all characters of human languages, it is necessary to pass it as the options parameter to the fs.readFile().
 
+# V8 JS Engine
+
+  - When JavaScript code is executed, it goes through several stages in the V8 engine:-
+    
+    **Parsing Stage:-**
+
+    1. **Lexical Analysis and Tokenization**
+      - The main goal of lexical analysis is to break down the raw JavaScript code into manageable pieces called tokens. Each token represents a fundamental element of the language, such as keywords, operators, identifiers, and literals.
+        Eg:- var a = 10; tokens = ['var', 'a', '=', '10', ';' ]
+
+    2. **Syntax Analysis and Abstract Syntax Tree (AST)**
+      - The tokens are converted into an Abstract Syntax Tree (AST). This process is crucial for transforming the flat list of tokens into a structured representation of the code. (https://astexplorer.net/)  to check the AST Tree.
+        var a = 10;
+        Variable Declaration
+          |_ Identifier(a)
+          |_ Literal (10)
+
+      - **Syntax Errors** : When the V8 engine reads code, it processes tokens one by one. If an unexpected token is encountered that does not fit the grammar rules, a syntax error occurs. This is because the AST cannot be generated if the code does not adhere to the expected syntax, indicating that something is wrong with the structure of the code.
+    
+    **Interpreter & Compilation**
+    1. Interpreted Language :- These languages are executed line by line. The interpreter reads and executes the code directly, which can lead to slower execution times compared to compiled languages. eg:- Python.
+      - Pros :- Faster to start executing code, easier to debug
+      - Cons :- Slower execution compared to compiled languages because of the lineby-line interpretation
+    
+    2. Compiled Languages :- These languages are first translated into machine code (binary code) through a process called compilation. The machine code is then executed by the computer’s hardware, leading to faster execution times. eg:- C, C++.
+      - Pros :- Faster execution because the code is pre-compiled into machine code.
+      - Cons :- Longer initial compilation time, more complex debugging process.
+
+    3. **JavaScript is neither purely interpreted nor purely compiled. It utilizes a combination of both techniques**
+      - Initial Execution by INTERPRETER: JavaScript uses an interpreter to execute code quickly and start running the script. This allows for rapid execution of scripts and immediate feedback.
+
+      - Just-In-Time (JIT) Compilation: JavaScript engines like V8 use JIT compilation to improve performance. JIT compilation involves compiling code into machine code at runtime, just before execution. This process optimizes performance by compiling frequently executed code paths into optimized machine code.
+
+      - (JS CODE) -> (Initial Interpretation line by line) -> (Execution) -> (JIT Compilation ,optimization) -> (Machine Code Execution)
+
+    4. ![alt text](images/image.png)
+
+# Libuv & Event Loop
+
 
 
