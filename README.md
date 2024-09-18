@@ -210,6 +210,20 @@ Just to learn the nodejs all concepts
 
     4. ![alt text](images/image.png)
 
+    5. **Optimization:** TurboFan converts the bytecode into optimized machine code, which improves performance for repeated executions.
+
+    6. **Deoptimization:** If TurboFan’s assumptions are incorrect (e.g., a function that was optimized for numbers receives strings), the optimization may fail. In such cases, TurboFan will deoptimize the code and revert it to a less optimized state. The code is then sent back to Ignition for further interpretation and possible re-optimization.
+
+    7. **Hot Code:** Refers to code that is executed frequently. TurboFan focuses on optimizing hot code to improve performance.
+
+    8. **Ignition:** Converts the AST into bytecode. Bytecode is a lower-level, intermediate representation of the code that the JavaScript engine can execute more efficiently than raw source code. Ignition reads and executes the bytecode line by line.
+
+    9. **TurboFan:** A compiler within the V8 engine that optimizes frequently executed (hot) code paths. When Ignition identifies a portion of the code that runs frequently (hot code), it sends this code to TurboFan for optimization.
+
+  **Best Practice:**  For optimal performance, try to pass consistent types and values to functions. For example, if a function is optimized for numeric
+  calculations, avoid passing strings to prevent deoptimization
+
+
 # Libuv & Event Loop
 
 
