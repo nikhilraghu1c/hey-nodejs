@@ -171,7 +171,7 @@ Just to learn the nodejs all concepts
     - Trust Issues with setTimeout(0) : When you ask the code to run after 0 milliseconds, it doesn't necessarily run immediately after that time. It runs only when the call stack of the main thread is empty. This introduces some "terms and conditions," meaning that the actual execution timing is dependent on the state of the call stack.
     - This means that even if you specify a 0-millisecond delay, the callback will only execute after the global execution context is done.
 
-  *Note* :- UTF-8 (Uniform Transformation Format 8-bit), is a character encoding standard that used for electronic communication. An encoding defines a mapping between bytes and text. Encoding is important as we consider the contents of a file to be in text format. As the utf-8 encoding is most common & covers nearly all characters of human languages, it is necessary to pass it as the options parameter to the fs.readFile().
+  **Note** :- UTF-8 (Uniform Transformation Format 8-bit), is a character encoding standard that used for electronic communication. An encoding defines a mapping between bytes and text. Encoding is important as we consider the contents of a file to be in text format. As the utf-8 encoding is most common & covers nearly all characters of human languages, it is necessary to pass it as the options parameter to the fs.readFile().
 
 # V8 JS Engine
 
@@ -180,45 +180,45 @@ Just to learn the nodejs all concepts
     **Parsing Stage:-**
 
     1. **Lexical Analysis and Tokenization**
-      - The main goal of lexical analysis is to break down the raw JavaScript code into manageable pieces called tokens. Each token represents a fundamental element of the language, such as keywords, operators, identifiers, and literals.
+        - The main goal of lexical analysis is to break down the raw JavaScript code into manageable pieces called tokens. Each token represents a fundamental element of the language, such as keywords, operators, identifiers, and literals.
         Eg:- var a = 10; tokens = ['var', 'a', '=', '10', ';' ]
 
     2. **Syntax Analysis and Abstract Syntax Tree (AST)**
-      - The tokens are converted into an Abstract Syntax Tree (AST). This process is crucial for transforming the flat list of tokens into a structured representation of the code. (https://astexplorer.net/)  to check the AST Tree.
+        - The tokens are converted into an Abstract Syntax Tree (AST). This process is crucial for transforming the flat list of tokens into a structured representation of the code. (https://astexplorer.net/)  to check the AST Tree.
         var a = 10;
         Variable Declaration
           |_ Identifier(a)
           |_ Literal (10)
 
-      - **Syntax Errors** : When the V8 engine reads code, it processes tokens one by one. If an unexpected token is encountered that does not fit the grammar rules, a syntax error occurs. This is because the AST cannot be generated if the code does not adhere to the expected syntax, indicating that something is wrong with the structure of the code.
+        - **Syntax Errors** : When the V8 engine reads code, it processes tokens one by one. If an unexpected token is encountered that does not fit the grammar rules, a syntax error occurs. This is because the AST cannot be generated if the code does not adhere to the expected syntax, indicating that something is wrong with the structure of the code.
     
     **Interpreter & Compilation**
-    1. Interpreted Language :- These languages are executed line by line. The interpreter reads and executes the code directly, which can lead to slower execution times compared to compiled languages. eg:- Python.
-      - Pros :- Faster to start executing code, easier to debug
-      - Cons :- Slower execution compared to compiled languages because of the lineby-line interpretation
+    1. **Interpreted Language:** These languages are executed line by line. The interpreter reads and executes the code directly, which can lead to slower execution times compared to compiled languages. eg:- Python.
+        - Pros :- Faster to start executing code, easier to debug
+        - Cons :- Slower execution compared to compiled languages because of the lineby-line interpretation
     
     2. Compiled Languages :- These languages are first translated into machine code (binary code) through a process called compilation. The machine code is then executed by the computer’s hardware, leading to faster execution times. eg:- C, C++.
-      - Pros :- Faster execution because the code is pre-compiled into machine code.
-      - Cons :- Longer initial compilation time, more complex debugging process.
+        - Pros :- Faster execution because the code is pre-compiled into machine code.
+        - Cons :- Longer initial compilation time, more complex debugging process.
 
     3. **JavaScript is neither purely interpreted nor purely compiled. It utilizes a combination of both techniques**
-      - Initial Execution by INTERPRETER: JavaScript uses an interpreter to execute code quickly and start running the script. This allows for rapid execution of scripts and immediate feedback.
+        - **Initial Execution by INTERPRETER:** JavaScript uses an interpreter to execute code quickly and start running the script. This allows for rapid execution of scripts and immediate feedback.
 
-      - Just-In-Time (JIT) Compilation: JavaScript engines like V8 use JIT compilation to improve performance. JIT compilation involves compiling code into machine code at runtime, just before execution. This process optimizes performance by compiling frequently executed code paths into optimized machine code.
+        - **Just-In-Time (JIT) Compilation:** JavaScript engines like V8 use JIT compilation to improve performance. JIT compilation involves compiling code into machine code at runtime, just before execution. This process optimizes performance by compiling frequently executed code paths into optimized machine code.
 
-      - (JS CODE) -> (Initial Interpretation line by line) -> (Execution) -> (JIT Compilation ,optimization) -> (Machine Code Execution)
+        - **(JS CODE) -> (Initial Interpretation line by line) -> (Execution) -> (JIT Compilation ,optimization) -> (Machine Code Execution)**
 
-    4. ![alt text](images/image.png)
+    ![alt text](images/image.png)
 
-    5. **Optimization:** TurboFan converts the bytecode into optimized machine code, which improves performance for repeated executions.
+    4. **Optimization:** TurboFan converts the bytecode into optimized machine code, which improves performance for repeated executions.
 
-    6. **Deoptimization:** If TurboFan’s assumptions are incorrect (e.g., a function that was optimized for numbers receives strings), the optimization may fail. In such cases, TurboFan will deoptimize the code and revert it to a less optimized state. The code is then sent back to Ignition for further interpretation and possible re-optimization.
+    5. **Deoptimization:** If TurboFan’s assumptions are incorrect (e.g., a function that was optimized for numbers receives strings), the optimization may fail. In such cases, TurboFan will deoptimize the code and revert it to a less optimized state. The code is then sent back to Ignition for further interpretation and possible re-optimization.
 
-    7. **Hot Code:** Refers to code that is executed frequently. TurboFan focuses on optimizing hot code to improve performance.
+    6. **Hot Code:** Refers to code that is executed frequently. TurboFan focuses on optimizing hot code to improve performance.
 
-    8. **Ignition:** Converts the AST into bytecode. Bytecode is a lower-level, intermediate representation of the code that the JavaScript engine can execute more efficiently than raw source code. Ignition reads and executes the bytecode line by line.
+    7. **Ignition:** Converts the AST into bytecode. Bytecode is a lower-level, intermediate representation of the code that the JavaScript engine can execute more efficiently than raw source code. Ignition reads and executes the bytecode line by line.
 
-    9. **TurboFan:** A compiler within the V8 engine that optimizes frequently executed (hot) code paths. When Ignition identifies a portion of the code that runs frequently (hot code), it sends this code to TurboFan for optimization.
+    8. **TurboFan:** A compiler within the V8 engine that optimizes frequently executed (hot) code paths. When Ignition identifies a portion of the code that runs frequently (hot code), it sends this code to TurboFan for optimization.
 
   **Best Practice:**  For optimal performance, try to pass consistent types and values to functions. For example, if a function is optimized for numeric
   calculations, avoid passing strings to prevent deoptimization
