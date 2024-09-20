@@ -300,6 +300,58 @@ Just to learn the nodejs all concepts
   **Note:** When the event loop is empty and there are no more tasks to execute, it enters the poll phase and essentially waits for incoming events
 
 ## Thread Pool In Libuv
+  - Whenever there's an asynchronous task, V8 offloads it to libuv. For example, when reading a file, libuv uses one of the threads in its thread pool. The file system (fs) call is assigned to a thread in the pool, and that thread makes a request to the OS. While the file is being read, the thread in the pool is fully occupied and cannot perform any other tasks. Once the file reading is complete, the engaged thread is freed up and becomes available for other operations. For instance, if you're performing a cryptographic operation like hashing, it will be assigned to another thread. There are certain functions for which libuv uses the thread pool.
+
+  - In Node.js, the default size of the thread pool is 4 threads: **UV_THREADPOOL_SIZE=4**
+  - Now, suppose you make 5 simultaneous file reading calls. What happens is that 4 file calls will occupy 4 threads, and the 5th one will wait until one of the threads is free.
+
+  **If you're dealing with synchronous code, Node.js is single-threaded. But if you're dealing with asynchronous tasks, it utilizes libuv's thread pool, making it multithreaded.**
+
+  - To change the size of the Thread Pool :- **process.env.UV_THREADPOOL_SIZE = 8;**
+
+  - For API Request, **Thread Pool Not Being Used**
+
+    ![alt text](images/api-request-handle-by-libuv.png)
+
+  - In the libuv library, when it interacts with the OS for networking tasks, it uses sockets. Networking operations occur through these sockets. Each socket has a socket descriptor, also known as a file descriptor (although this has nothing to do with the file system)
+
+  - When an incoming request arrives on a socket, and you want to write data to this connection, it involves blocking operations. To handle this, a thread is created for each request. However, creating a separate thread for each connection is not practical, especially when dealing with thousands of requests. Instead, the system uses efficient mechanisms provided by the OS, such as epoll (on Linux) or kqueue (on macOS). These mechanisms handle multiple file descriptors (sockets) without needing a thread per connection.
+
+  **Here’s how it works:**
+    1. epoll (Linux) and kqueue (macOS) are notification mechanisms used to manage many connections efficiently.
+    2. When you create an epoll or kqueue descriptor, it monitors multiple file descriptors (sockets) for activity.
+    3. The OS kernel manages these mechanisms and notifies libuv of any changes or activity on the sockets.
+    4. This approach allows the server to handle a large number of connections efficiently without creating a thread for each one.
+
+  - The kernel-level mechanisms, like epoll and kqueue , provide a scalable way to manage multiple connections, significantly improving performance and resource utilization in a high-concurrency environment.
+
+  - **File Descriptors (FDs)** are integral to Unix-like operating systems, including Linux and macOS. They are used by the operating system to manage open files, sockets, and other I/O resources.
+
+  - **Socket descriptors** are a special type of file descriptor used to manage network connections. They are essential for network programming, allowing processes to communicate over a network.
+
+  - **Event Emitters** are a core concept in Node.js, used to handle asynchronous events. They allow objects to emit named events that can be listened to by other parts of the application. The EventEmitter class is provided by the Node.js events module.
+
+  ```javascript
+    const EventEmitter = require('node:events');
+    const eventEmitter = new EventEmitter();
+    eventEmitter.on('start', () => {
+      console.log('started');
+    });
+    eventEmitter.emit('start');
+  ``` 
+
+  - **Streams** in Node.js are objects that facilitate reading from or writing to a data source in a continuous fashion. Streams are particularly useful for handling large amounts of data efficiently.
+
+  - **Buffers** are used to handle binary data in Node.js. They provide a way to work with raw memory allocations and are useful for operations involving binary data, such as reading files or network communications.
+
+  - **Pipes** in Node.js are a powerful feature for managing the flow of data between streams. They simplify the process of reading from a readable stream and writing to a writable stream, facilitating efficient and seamless data processing. Piping in NodeJS is the process by which byte data from one stream is sent to another stream.
+
+    ![alt text](images/nodejs-lesson-1.png)
+
+# Creating A Server
+
+
+
 
 
 
