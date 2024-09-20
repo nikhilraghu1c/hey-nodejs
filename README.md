@@ -247,8 +247,7 @@ Just to learn the nodejs all concepts
 
   **Event Loop Cycle with process.nextTick() and Promises [veryimportant]**
     Before the event loop moves to each of its main phases (Timers, I/O Callbacks, Poll, Check, and Close Callbacks), it first processes any pending microtasks. Microtasks include tasks scheduled using process.nextTick() and Promise callbacks. This ensures that these tasks are handled promptly before moving on to the next phase.
-
-    ![alt text](images/eventloop2.png)
+      ![alt text](images/eventloop2.png)
 
     ```javascript
       const fs = require("fs");
