@@ -197,7 +197,7 @@ Just to learn the nodejs all concepts
         - Pros :- Faster to start executing code, easier to debug
         - Cons :- Slower execution compared to compiled languages because of the lineby-line interpretation
     
-    2. Compiled Languages :- These languages are first translated into machine code (binary code) through a process called compilation. The machine code is then executed by the computer’s hardware, leading to faster execution times. eg:- C, C++.
+    2. **Compiled Languages:** These languages are first translated into machine code (binary code) through a process called compilation. The machine code is then executed by the computer’s hardware, leading to faster execution times. eg:- C, C++.
         - Pros :- Faster execution because the code is pre-compiled into machine code.
         - Cons :- Longer initial compilation time, more complex debugging process.
 
@@ -208,7 +208,7 @@ Just to learn the nodejs all concepts
 
         - **(JS CODE) -> (Initial Interpretation line by line) -> (Execution) -> (JIT Compilation ,optimization) -> (Machine Code Execution)**
 
-    ![alt text](images/image.png)
+    ![alt text](images/jsengine.png)
 
     4. **Optimization:** TurboFan converts the bytecode into optimized machine code, which improves performance for repeated executions.
 
@@ -225,6 +225,82 @@ Just to learn the nodejs all concepts
 
 
 # Libuv & Event Loop
+  - The **Event loop** in libuv is the heart of how Node.js handles asynchronous operations. It allows Node.js to perform non-blocking I/O operations, even though
+  JavaScript is single-threaded. Tasks that are offloaded to libuv include file system operations, DNS lookups, and network requests, among others.
+  - The **Callback queue** is where callbacks are stored after an asynchronous operation is completed. The event loop processes this queue to execute the callbacks when the call stack is empty.
+  - The **Thread pool**, on the other hand, is used for handling more time-consuming tasks that cannot be handled within the event loop without blocking it, such as file
+  system operations or cryptographic functions.
+    ![alt text](images/libuv.png)
+
+  - Event loop continuosly checking call stack & callback queue, whenever call stack is empty then it takes task from the call back queue and pass it to call stack to execute.
+    ![alt text](images/eventloop1.png)
+
+  **The event loop in LIBUV operates in four major phases:**
+    1. **Timers Phase:** In this phase, all callbacks that were set using setTimeout or setInterval are executed. These timers are checked, and if their time has expired, their corresponding callbacks are added to the callback queue for execution.
+
+    2. **Poll Phase:** After timers, the event loop enters the Poll phase, which is crucial because it handles I/O callbacks. For instance, when you perform a file read operation using fs.readFile , the callback associated with this I/O operation will be executed in this phase. The Poll phase is responsible for handling all I/Orelated tasks, making it one of the most important phases in the event loop.
+
+    3. **Check Phase:** Next is the Check phase, where callbacks scheduled by the setImmediate function are executed. This utility API allows you to execute callbacks immediately after the Poll phase, giving you more control over the order of operations.
+
+    4. **Close Callbacks Phase:** Finally, in the Close Callbacks phase, any callbacks associated with closing operations, such as socket closures, are handled. This phase is typically used for cleanup tasks, ensuring that resources are properly released.
+
+  **Event Loop Cycle with process.nextTick() and Promises [veryimportant]**
+    Before the event loop moves to each of its main phases (Timers, I/O Callbacks, Poll, Check, and Close Callbacks), it first processes any pending microtasks. Microtasks include tasks scheduled using process.nextTick() and Promise callbacks. This ensures that these tasks are handled promptly before moving on to the next phase.
+
+    ![alt text](images/eventloop2.png)
+
+    ```javascript
+      const fs = require("fs");
+      setImmediate(() => {
+        console.log("setImmediate");
+      });
+
+      setTimeout(() => {
+        console.log("setTimeout");
+      }, 0);
+
+      Promise.resolve().then(() => {
+        console.log("Promise 1");
+      });
+
+      fs.readFile("./file.txt", "utf-8", () => {
+        setTimeout(() => {
+          console.log("setTimeout inside readFile");
+        },0);
+
+        process.nextTick(() => {
+          console.log("process.nextTick inside readFile");
+        });
+
+        setImmediate(() => {
+          console.log("setImmediate inside readFile");
+        });
+        console.log("File reading completed");
+      });
+
+      process.nextTick(() => {
+        console.log("process.nextTick");
+      });
+
+      console.log("Last line of the script");
+
+      /**
+      * Output:
+      * Last line of the script
+      * process.nextTick
+      * Promise 1
+      * setImmediate
+      * File reading completed
+      * process.nextTick inside readFile
+      * setImmediate inside readFile
+      * setTimeout inside readFile
+      */
+    ```
+
+  **Note:** When the event loop is empty and there are no more tasks to execute, it enters the poll phase and essentially waits for incoming events
+
+## Thread Pool In Libuv
+
 
 
 
