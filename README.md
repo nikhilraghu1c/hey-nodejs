@@ -236,6 +236,7 @@ Just to learn the nodejs all concepts
     ![alt text](images/eventloop1.png)
 
   **The event loop in LIBUV operates in four major phases:**
+    
     1. **Timers Phase:** In this phase, all callbacks that were set using setTimeout or setInterval are executed. These timers are checked, and if their time has expired, their corresponding callbacks are added to the callback queue for execution.
 
     2. **Poll Phase:** After timers, the event loop enters the Poll phase, which is crucial because it handles I/O callbacks. For instance, when you perform a file read operation using fs.readFile , the callback associated with this I/O operation will be executed in this phase. The Poll phase is responsible for handling all I/Orelated tasks, making it one of the most important phases in the event loop.
