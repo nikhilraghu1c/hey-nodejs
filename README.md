@@ -348,7 +348,54 @@ Just to learn the nodejs all concepts
 
     ![alt text](images/nodejs-lesson-1.png)
 
-# Creating A Server
+# Web And Server
+
+  - The term "server" can refer to both hardware and software, depending on the context.
+    - **Hardware:** A physical machine (computer) that provides resources and services to other computers (clients) over a network.
+    - **Software:** An application or program that handles requests and delivers data to clients.
+  
+  - **Deploying an Application on a Server:** When someone says "deploy your app on a server," they usually mean:
+    1. Hardware Aspect: You need a physical machine (server) to run your application. This machine has a CPU, RAM, storage, etc.
+    2. Operating System (OS): The server hardware runs an operating system like Linux or Windows. Your application runs on this OS.
+    3. Server Software: The software (e.g., a web server like Apache or an application server built with Node.js) that handles requests from users.
+
+  - **Software Servers in Node.js:** When you create an HTTP server in Node.js, you’re building an application that listens for requests from clients and responds to them. This is an example of a software server.
+
+      ![alt text](images/client-server-arch.png)
+      ![alt text](images/client-server-arch2.png)
+      ![alt text](images/client-server-arch3.png)
+
+  - **Creating multiple HTTP server**, it means we are setting up two differentNode.js applications. The distinction between these servers is defined by a port, which is a 4-digit number (e.g., port 3000, 3001).
+
+  - In many companies, the frontend and backend may also be hosted on different servers. This separation allows each part of the system to be optimized for its specific role, ensuring better performance and making the system more scalable and resilient. This distributed approach helps large companies manage massive amounts of data and traffic efficiently, ensuring that users have a smooth and responsive experience.
+
+      ![alt text](images/client-server-arch4.png)
+
+  - **Sockets Vs Web Sockets**
+    - When a user makes a request to a website, a socket connection is established between the client and the server. This connection is typically used for a single request-response cycle: the client sends a request, the server processes it, sends back the response, and then the socket is closed. This process involves opening a new connection for each request.
+
+    - On the other hand, WebSockets introduce a more efficient method by allowing the connection to remain open. This means that after the initial connection is established, it stays active, allowing for continuous communication between the client and server. Both the client and server can send and receive data at any time without the need to re-establish the connection. This persistent connection is ideal for real-time applications, where continuous interaction is required, such as in chat applications, online gaming, or live updates.
+
+  - **Creating a Server**
+
+    ```javascript
+      const http = require("http");
+      const server = http.createServer((req, res) => {
+        if(req.url === "/getSecretData") {
+          res.end("Secret Data!!!");
+        } else {
+          res.end("Hello World!!!");
+        }
+      });
+      server.listen(7777);
+
+      // localhost:7777 => Hello World!!!
+      // localhost:7777/getSecretData => Secret Data!!!
+    ```
+
+  **Note:** We use Express to create a server. Express is a framework built on top of Node.js that makes our lives easier
+
+
 
 
 
