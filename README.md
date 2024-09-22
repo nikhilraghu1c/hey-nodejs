@@ -395,6 +395,50 @@ Just to learn the nodejs all concepts
 
   **Note:** We use Express to create a server. Express is a framework built on top of Node.js that makes our lives easier
 
+# Database - SQL or NoSQL
+
+  - **Database:** Organized collection of data or a type of data store based on the use of a DBMS, ths software that interacts with the end users, applications, and analyze the data.
+  - **Types of databases:** 
+    1. **Relational DB - MySQL, PostgreSQL:** Relational databases like MySQL and PostgreSQL use structured tables with predefined schemas, making them ideal for handling complex queries and transactions. They ensure data integrity through ACID properties and are widely used for applications requiring robust, relational data models.
+
+    2. **NoSQL DB - MongoDB:** MongoDB is a NoSQL database that stores data in flexible, JSON-like documents, allowing for dynamic schemas. It's highly scalable and ideal for handling large volumes of unstructured or semi-structured data, making it popular for modern web applications.
+
+    3. **In-memory DB - Redis:** Redis is an in-memory database known for its high-speed data processing capabilities. It supports various data structures like strings, hashes, and lists, making it suitable for caching, real-time analytics, and message brokering.
+
+    4. **Distributed SQL DB - CockroachDB**
+    5. **Time Series DB - InfluxDB**
+    6. **OO DB - db4o**
+    7. **Graph DB - Neo4j**
+    8. **Hierarchical DB - IBM IMS**
+    9. **Network DB - IDMS**
+    10. **Cloud DB - Amazon RDS**
+
+  - Most commonly used databases are :
+    1. Relational DB
+    2. NoSQL DB
+
+  - NoSQL databases can be classified into four main types:
+    1. Document Databases **(MongoDB use this NoSQL database)**
+    2. Key-Value Databases
+    3. Graph Databases
+    4. Wide-Column Databases
+    5. Multi-Model Databases
+
+  ![alt text](images/rdbmsvsmongodb.png)
+  ![alt text](images/rdbmsvsmongodb2.png)
+
+  - **Table Structure:** RDBMS organizes data into tables with rows and columns. In contrast, NoSQL document databases use collections of documents, where each document can have a flexible and nested structure.
+  - **Data Organization:** RDBMS has a structured format, while NoSQL offers a flexible schema, allowing documents to vary in structure.
+  - **Schema:** RDBMS requires a fixed schema, meaning the structure must be predefined and is not easily changeable. NoSQL databases have a schemaless design, allowing for easy changes and adaptability.
+  - **Query Language:** RDBMS uses SQL for querying, which is a standardized language for relational databases. NoSQL databases have their own query mechanisms, which can vary depending on the
+  database system.
+  - **Scaling:** RDBMS generally faces challenges with horizontal scaling (scaling out across multiple servers). NoSQL databases are designed for easier horizontal scaling, making them more suitable for distributed environments.
+  - **Relationships:** RDBMS uses foreign keys and joins to manage relationships between tables. NoSQL document databases handle relationships by embedding related data within documents or using references.
+  - **Use Case:** RDBMS is often used in scenarios requiring complex transactions and strong consistency, such as banking systems. NoSQL databases are preferred for applications needing flexible data models and high-performance, such as content management systems and real-time data processing.
+  - **Examples:** RDBMS examples include banking applications that need ACID compliance and complex transactions. NoSQL examples include systems like content management and real-time analytics platforms, where flexibility and scalability are key
+
+
+
 
 
 
