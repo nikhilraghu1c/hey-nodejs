@@ -437,13 +437,34 @@ Just to learn the nodejs all concepts
   - **Use Case:** RDBMS is often used in scenarios requiring complex transactions and strong consistency, such as banking systems. NoSQL databases are preferred for applications needing flexible data models and high-performance, such as content management systems and real-time data processing.
   - **Examples:** RDBMS examples include banking applications that need ACID compliance and complex transactions. NoSQL examples include systems like content management and real-time analytics platforms, where flexibility and scalability are key
 
+# MongoDB 
+  
+  1. **Create a New User and Password**
+    - Go to mongodb.com and create a new M0 cluster
+    - Get the connection string and replace the password with the one you created.
 
+  2. **Install MongoDB Compass and Connect**
+      - Create a new database and collection.
+      - Create a new document with some fields.
 
+  3. **Set Up MongoDB Using Code**
+      - Install the MongoDB npm package: `npm install mongodb` 
+        - [MongoDB Node.js Driver Documentation](https://mongodb.github.io/node-mongodb-native/6.8/)
 
+  4. **Create and Run the Database Script**
+      - Create a new file `database.js`.
+      - Add the necessary code to the file.
+      - Run the file using `node database.js`.
+      - Check the output in the console.
+      - Verify the database and collection in MongoDB Compass.
 
+  5. **Check CRUD Operations**
+      - Refer to the documentation for CRUD operations queries.
+      - Go to the collection option in the documentation and check the query for many operations.
 
+  6. **Set Up .gitignore**
+      - Create a `.gitignore` file and add `node_modules/` to it.
 
-
-
-
-
+  7. **Use Mongoose ORM in Production**
+      - In production, use Mongoose ORM for MongoDB, which is a wrapper around the MongoDB npm package and provides a schema-based solution for MongoDB operations.
+        - [Mongoose Documentation](https://mongoosejs.com/docs/guide.html)
