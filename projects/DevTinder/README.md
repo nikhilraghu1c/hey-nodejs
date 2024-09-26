@@ -52,3 +52,12 @@
          */
     ```
 - app.get(), app.post(), app.delete(), app.post() => we can use this for specific route for specific purpose.
+
+- app.get("/ab?c") => ? define optional so b is optional here
+    o/p => **/ab , /abc** both route give same output and both will work
+    eg.- ("/a(bc)?d") => bc is optional 
+        o/p => **/abcd, ac**
+
+- app.get("/ab+c") o/p => **/abc, /abbc, /abbbc, abbb...c** (Any count of b in between a and c)
+
+- app.get("/ab*cd") o/p => **/abNIKHILcd** (Any keyword in between ab and cd)
