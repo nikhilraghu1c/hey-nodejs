@@ -61,3 +61,22 @@
 - app.get("/ab+c") o/p => **/abc, /abbc, /abbbc, abbb...c** (Any count of b in between a and c)
 
 - app.get("/ab*cd") o/p => **/abNIKHILcd** (Any keyword in between ab and cd)
+
+- https://localhost:7777/user?firstName=Nikhil&lastName=Raghuwanshi => 
+  ```javascript
+    app.get("/user", (req, res) => {
+        console.log(req.query);
+        res.send("Query params");
+    });
+  ```
+    **req.query will give us the query params**
+
+- https://localhost:7777/user/123 https://localhost:7777/user/234
+
+ ```javascript
+    app.get("/user/:userid", (req, res) => {
+        console.log(req.params);
+        res.send("Query params");
+    });
+  ```
+  **req.params will give us the params**
