@@ -72,11 +72,10 @@
     **req.query will give us the query params**
 
 - https://localhost:7777/user/123 https://localhost:7777/user/234
-
- ```javascript
+  ```javascript
     app.get("/user/:userid", (req, res) => {
         console.log(req.params);
         res.send("Query params");
     });
   ```
-  **req.params will give us the params**
+    **req.params will give us the params**
