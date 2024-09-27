@@ -93,3 +93,5 @@
       res.send("Hello User 2!!");
     });
   ```
+    **If we write the next and there is no next middleware then it will throw an error**
+    **All route handler can be written inside the array also [(req,res) => {}, (req,res) => {}]**
