@@ -56,9 +56,9 @@
 - app.get("/ab?c") => ? define optional so b is optional here
     o/p => **/ab , /abc** both route give same output and both will work
     eg.- ("/a(bc)?d") => bc is optional 
-        o/p => **/abcd, ac**
+        o/p => **/abcd, /ac**
 
-- app.get("/ab+c") o/p => **/abc, /abbc, /abbbc, abbb...c** (Any count of b in between a and c)
+- app.get("/ab+c") o/p => **/abc, /abbc, /abbbc, /abbb...c** (Any count of b in between a and c)
 
 - app.get("/ab*cd") o/p => **/abNIKHILcd** (Any keyword in between ab and cd)
 
@@ -110,7 +110,8 @@
     res.status(401).send("Unauthorized Access");
     // res.status(401) use to send the status code 401
   ```
-    **If we write the next and there is no next middleware then it will throw an error**
+    **If we write the next and there is no next middleware then it will throw an error.**
+    
     **All route handler can be written inside the array also [(req,res) => {}, (req,res) => {}]**
 
 - **Middleware** is a request handler that allows you to intercept and manipulate requests and responses before they reach route handlers. They are the functions that are invoked by the Express.js routing layer. Middleware mainly use for logging and authentication purpose. **Route handlers** in Express.js are functions that handle requests when a matching route is found.
