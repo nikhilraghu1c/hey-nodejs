@@ -111,7 +111,7 @@
     // res.status(401) use to send the status code 401
   ```
     **If we write the next and there is no next middleware then it will throw an error.**
-    
+
     **All route handler can be written inside the array also [(req,res) => {}, (req,res) => {}]**
 
 - **Middleware** is a request handler that allows you to intercept and manipulate requests and responses before they reach route handlers. They are the functions that are invoked by the Express.js routing layer. Middleware mainly use for logging and authentication purpose. **Route handlers** in Express.js are functions that handle requests when a matching route is found.
@@ -122,8 +122,8 @@
     ```javascript
       // Handle Auth Middleware for all the request to /admin (Get, Post, Put, Delete)
       app.use("/admin", (req, res, next) => {
-      console.log("Admin auth getting checked")
-      const token = "xyz";
+        console.log("Admin auth getting checked")
+        const token = "xyz";
         if (token === "xyz") {
           next();
         } else {
@@ -144,6 +144,7 @@
 
 - Always use **try-catch** block to handle errors inside the route handler
     **Example:-**
+
       ```javascript
         app.get("/getUserData", (req, res) => {
           // Logic of DB call and get user data
@@ -155,7 +156,6 @@
             res.status(500).send("DB Connection Failed");
           }
         });
-
         // Wild card Error Handling
         app.use("/", (err, req, res, next) => {
           if(err) {
