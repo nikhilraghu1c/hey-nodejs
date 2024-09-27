@@ -1,24 +1,16 @@
 const express = require("express");
 const app = express();
 
-// regex /a/ will match any string that has a in it. we can also give regex on the route
-app.get(/a/, (req, res) => {
-  res.send({ firstName: "Nikhil", lastName: "Raghuwanshi" });
-});
-
-// https://localhost:7777/user?firstName=Nikhil&lastName=Raghuwanshi
-// req.query will give us the query params
-app.get("/user", (req, res) => {
-  console.log(req.query);
-  res.send({ firstName: "Nikhil", lastName: "Raghuwanshi" });
-});
-
-// https://localhost:7777/user/123 https://localhost:7777/user/234
-// req.params will give us the params
-// Dynamic route
-app.get("/user/:userId", (req, res) => {
-  console.log(req.params);
-  res.send({ firstName: "Nikhil", lastName: "Raghuwanshi" });
+// We can add multiple request handlers to a single route
+// (req,res) => {} is a request handler 
+app.use("/user", (req, res, next) => {
+  console.log("Handling the route user!!");
+  // res.send("Hello User!!"); // next will called and error will be thrown
+  // nextis use to pass the control to the next request handler called as middleware
+  next();
+}, (req, res) => {
+  console.log("Handling the route user 2!!");
+  res.send("Hello User 2!!");
 });
 
 app.listen(7777, () => {
