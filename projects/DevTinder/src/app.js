@@ -15,12 +15,10 @@ app.use("/admin", (req, res, next) => {
 
 // Middleware mainly use for logging and authentication purpose
 app.get("/admin/getAllData", (req, res) => {
-  // Logic of checking if the request is authorized
   res.send("All Data Sent");
 });
 
 app.get("/admin/deleteUser", (req, res) => {
-  // Logic of checking if the request is authorized
   res.send("Deleted User");
 });
 
