@@ -88,7 +88,7 @@
       console.log("Handling the route user!!");
 
       // res.send("Hello User!!"); // next is called and error will be thrown
-      // nextis use to pass the control to the next request handler called as middleware
+      // nextis use to pass the control to the next request handler
       
       next();
     }, (req, res) => {
@@ -106,6 +106,14 @@
       console.log("Handling the route 2 user!!");
       res.send("Hello from user!!");
     });
+
+    res.status(401).send("Unauthorized Access");
+    // res.status(401) use to send the status code 401
   ```
     **If we write the next and there is no next middleware then it will throw an error**
     **All route handler can be written inside the array also [(req,res) => {}, (req,res) => {}]**
+
+- **Middleware** is a request handler that allows you to intercept and manipulate requests and responses before they reach route handlers. They are the functions that are invoked by the Express.js routing layer. Middleware mainly use for logging and authentication purpose. **Route handlers** in Express.js are functions that handle requests when a matching route is found.
+  ```javascript
+    app.get(path, (req, res, next) => {}, (req, res) => {});
+  ```

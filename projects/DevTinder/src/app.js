@@ -1,19 +1,27 @@
 const express = require("express");
 const app = express();
 
-// We can add multiple request handlers to a single route
-// (req,res) => {} is a request handler 
-// All route handler can be written inside the array also [(req,res) => {}, (req,res) => {}]
-// we can also define multiple app.get() for the same route and it will work same as array
-  
-app.get("/user", (req, res, next) => {
-  console.log("Handling the route user!!");
-  next();
+// Handle Auth Middleware for all the request to /admin (Get, Post, Put, Delete)
+app.use("/admin", (req, res, next) => {
+ console.log("Admin auth getting checked")
+ const token = "xyz";
+  if (token === "xyz") {
+    next();
+  } else {
+    res.status(401).send("Unauthorized Access");
+    // res.status(401) use to send the status code 401
+  }
 });
 
-app.get("/user", (req, res, next) => {
-  console.log("Handling the route 2 user!!");
-  res.send("Hello from user!!");
+// Middleware mainly use for logging and authentication purpose
+app.get("/admin/getAllData", (req, res) => {
+  // Logic of checking if the request is authorized
+  res.send("All Data Sent");
+});
+
+app.get("/admin/deleteUser", (req, res) => {
+  // Logic of checking if the request is authorized
+  res.send("Deleted User");
 });
 
 app.listen(7777, () => {
