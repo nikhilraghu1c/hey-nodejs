@@ -140,3 +140,30 @@
         res.send("Deleted User");
       });
     ```
+
+- Always use **try-catch** block to handle errors inside the route handler
+    **Example:-**
+      ```javascript
+        app.get("/getUserData", (req, res) => {
+          // Logic of DB call and get user data
+          try {
+            res.send("User Data Sent");
+          }
+          catch (err) {
+            console.log("DB Connection Failed");
+            res.status(500).send("DB Connection Failed");
+          }
+        });
+
+        // Wild card Error Handling
+        app.use("/", (err, req, res, next) => {
+          if(err) {
+            // Log the error
+            res.status(500).send("Something went wrong");
+          }
+        });
+      ```
+  - (req, res) => Sequence if 2 parameters passed
+  - (req, res, next) => Sequence if 3 parameters passed
+  - (err, req, res, next) => Sequence if 4 parameter passed
+  - **Note: Order is important of route**
