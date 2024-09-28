@@ -191,8 +191,9 @@
   - (err, req, res, next) => Sequence if 4 parameter passed
   - **Note: Order is important of route**
 
-# DATABASE/CLUSTER Connection Using Mongoose
+# Database/Cluster connection using Mongoose
 
+- https://mongoosejs.com/docs/index.html
 - First Need to connect with the mongodb cluster using connection url
 - Create a config file with database.js file inside it and then install npm package mongoose
   **npm install mongoose**
@@ -227,3 +228,20 @@
       console.log("Database cannot be connected!!");
     });
   ```
+
+  # Schema & Models
+    - Everything in Mongoose starts with a **Schema**. Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
+    - **Models** are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
+    ```javascript
+    // example creating a user schema & model
+    const mongoose = require("mongoose");
+    const userSchema = new mongoose.Schema({
+      firstName: {
+        type: String,
+      },
+      lastName: {
+        type: String,
+      },
+    });
+    module.exports = mongoose.model("User", userSchema);
+    ```

@@ -10,5 +10,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.log("Database cannot be connected!!");
+    console.log("Unable to connect to database cluster!!");
   });
