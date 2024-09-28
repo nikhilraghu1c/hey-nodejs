@@ -294,6 +294,8 @@
 
   # API's
 
+  **https://mongoosejs.com/docs/api/model.html**
+  
   - **FEED API:** Get API to get all the user
     - We can use mongoose model given functions to get or find the data from the database 
     ```javascript
@@ -314,4 +316,21 @@
         const users = await User.find({ emailId: userEmail });
          res.send(users);
     ```
-  - 
+  - **Delete API** - to delete the user by userId
+    ```javascript
+      app.delete("/user", async(req, res) => {
+        const userId = req.body.userId;
+        try {
+          // const user = await User.findByIdAndDelete({ _id: userId }); Both are correct
+          const user = await User.findByIdAndDelete(userId); // ({_id: userId}) === (userId)
+          if (!user) {
+            res.status(404).send("No user found with the given user id");
+          } else {
+            res.send("User deleted successfully");
+          }
+        } catch (err) {
+          res.status(400).send("Error while deleting user:" + err.message);
+        }
+      });
+    ```
+
