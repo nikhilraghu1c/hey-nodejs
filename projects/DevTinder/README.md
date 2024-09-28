@@ -291,3 +291,27 @@
     }
   });
   ```
+
+  # API's
+
+  - **FEED API:** Get API to get all the user
+    - We can use mongoose model given functions to get or find the data from the database 
+    ```javascript
+      const User = require("./models/user");
+      app.get("/feed", async (req, res) => {
+        try {
+          const users = await User.find({});
+          res.send(users);
+        } catch (err) {
+          res.status(400).send("Error while fetching users:" + err.message);
+        }
+      });
+    ```
+
+    - To Get user by email 
+    ```javascript
+        const userEmail = req.body.email;
+        const users = await User.find({ emailId: userEmail });
+         res.send(users);
+    ```
+  - 
