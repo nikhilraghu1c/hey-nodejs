@@ -8,7 +8,6 @@ app.use(express.json());
 
 /** API to signup a user */
 app.post("/signup", async (req, res) => {
-  
   // Creating a new instance of the User model
 
   const user = new User(req.body);
@@ -46,7 +45,7 @@ app.get("/feed", async (req, res) => {
 });
 
 /** Delete API - to delete the user by userId */
-app.delete("/user", async(req, res) => {
+app.delete("/user", async (req, res) => {
   const userId = req.body.userId;
   try {
     // const user = await User.findByIdAndDelete({ _id: userId }); Both are correct
@@ -61,6 +60,24 @@ app.delete("/user", async(req, res) => {
   }
 });
 
+/** Update API - to update the data of the user */
+
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    // returnDocument: "before" returns the document before the update is applied, optional but useful
+    // First parameter is the id of the document to be updated and the second parameter is the data to be updated
+    // If in the data any extra field is added which is not in the schema then it will not be added to the document , It will be ignored
+    const dataBefore = await User.findByIdAndUpdate(userId, data, {
+      returnDocument: "before",
+    });
+    console.log(dataBefore);
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(400).send("Error while updating user:" + err.message);
+  }
+});
 
 connectDB()
   .then(() => {

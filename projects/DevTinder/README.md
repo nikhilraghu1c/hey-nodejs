@@ -30,6 +30,8 @@
 - GET (/profile, /requests, /connections)
 - DELETE (/profile)
 
+**Note:** Difference between **PATCH** and **PUT** in REST APIs is that **PATCH** is used to apply partial updates to a resource, while **PUT** is used to replace the entire resource
+
 # ExpressJS
 
 - Install ExpressJS using **npm i express**.
@@ -332,5 +334,25 @@
           res.status(400).send("Error while deleting user:" + err.message);
         }
       });
+    ```
+
+  - **Update API** - to update the user data by userId
+    ```javascript
+      app.patch("/user", async (req, res) => {
+      const userId = req.body.userId;
+      const data = req.body;
+      try {
+        // First parameter is the id of the document to be updated and the second parameter is the data to be updated
+        // If in the data any extra field is added which is not in the schema then it will not be added to the document , It will be ignored
+        // returnDocument: "before" returns the document before the update is applied, optional but useful
+        const dataBefore = await User.findByIdAndUpdate(userId, data, {
+          returnDocument: "before",
+        });
+        console.log(dataBefore);
+        res.send("User updated successfully");
+      } catch (err) {
+        res.status(400).send("Error while updating user:" + err.message);
+      }
+    });
     ```
 
