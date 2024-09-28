@@ -232,38 +232,62 @@
   ```
 
   # Schema & Models
-    - Everything in Mongoose starts with a **Schema**. Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
-    - **Models** are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
-    ```javascript
-    // example creating a user schema & model, 
-    // /models/user.js
-    const mongoose = require("mongoose");
-    const userSchema = new mongoose.Schema({
-      firstName: {
-        type: String,
-      },
-      lastName: {
-        type: String,
-      },
-    });
-    module.exports = mongoose.model("User", userSchema);
 
-    // app.js
-    // creating first signup API to signup a user
-    app.post("/signup", async (req, res) => {
-      // Creating a new instance of the User model
-      const userObj = {
-        firstName: "Sachin",
-        lastName: "Tendulkar",
-        emailId: "sachin@tendulkar.com",
-        password: "sachin@123",
-      };
-      try {
-        const user = new User(userObj);
-        await user.save();
-        res.send("User added successfully");
-      } catch (err) {
-        res.status(400).send("Error while adding user:" + err.message);
-      }
-    });
-    ```
+  - Everything in Mongoose starts with a **Schema**. Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
+  - **Models** are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
+
+  ```javascript
+  // example creating a user schema & model,
+  // /models/user.js
+  const mongoose = require("mongoose");
+  const userSchema = new mongoose.Schema({
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+  });
+  module.exports = mongoose.model("User", userSchema);
+
+  // app.js
+  // creating first signup API to signup a user
+  app.post("/signup", async (req, res) => {
+    // Creating a new instance of the User model
+    const userObj = {
+      firstName: "Sachin",
+      lastName: "Tendulkar",
+      emailId: "sachin@tendulkar.com",
+      password: "sachin@123",
+    };
+    try {
+      const user = new User(userObj);
+      await user.save();
+      res.send("User added successfully");
+    } catch (err) {
+      res.status(400).send("Error while adding user:" + err.message);
+    }
+  });
+  ```
+
+  - **If the any key on userobj/request body is wrong, then it will be filter by the User model and it will not save into the DB**
+
+  - Now if to take request body from the user for POST API then we will get the data in (req, res). But data is in form of JSON and JSON format is not supported/readable in the request handler then we can use one **Middleware** to convert that JSON Data into the Javascript object
+  - To Convert JSON Data into JS object, Express given us one middleware **express.json()**
+
+  ```javascript
+  // Middleware to parse the request body
+  app.use(express.json());
+
+  // API to signup a user
+  app.post("/signup", async (req, res) => {
+    // Creating a new instance of the User model
+    const user = new User(req.body);
+    try {
+      await user.save();
+      res.send("User added successfully");
+    } catch (err) {
+      res.status(400).send("Error while adding user:" + err.message);
+    }
+  });
+  ```
