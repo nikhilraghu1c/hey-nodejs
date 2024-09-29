@@ -233,243 +233,292 @@
     });
   ```
 
-  # Schema & Models
+# Schema & Models
 
-  - Everything in Mongoose starts with a **Schema**. Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
-  - **Models** are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
+- Everything in Mongoose starts with a **Schema**. Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
+- **Models** are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
+
+```javascript
+// example creating a user schema & model,
+// /models/user.js
+const mongoose = require("mongoose");
+const userSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+  },
+  lastName: {
+    type: String,
+  },
+});
+module.exports = mongoose.model("User", userSchema);
+
+// app.js
+// creating first signup API to signup a user
+app.post("/signup", async (req, res) => {
+  // Creating a new instance of the User model
+  const userObj = {
+    firstName: "Sachin",
+    lastName: "Tendulkar",
+    emailId: "sachin@tendulkar.com",
+    password: "sachin@123",
+  };
+  try {
+    const user = new User(userObj);
+    await user.save();
+    res.send("User added successfully");
+  } catch (err) {
+    res.status(400).send("Error while adding user:" + err.message);
+  }
+});
+```
+
+- **If the any key on userobj/request body is wrong, then it will be filter by the User model and it will not save into the DB**
+
+- Now if to take request body from the user for POST API then we will get the data in (req, res). But data is in form of JSON and JSON format is not supported/readable in the request handler then we can use one **Middleware** to convert that JSON Data into the Javascript object
+- To Convert JSON Data into JS object, Express given us one middleware **express.json()**
+
+```javascript
+// Middleware to parse the request body
+app.use(express.json());
+
+// API to signup a user
+app.post("/signup", async (req, res) => {
+  // Creating a new instance of the User model
+  const user = new User(req.body);
+  try {
+    await user.save();
+    res.send("User added successfully");
+  } catch (err) {
+    res.status(400).send("Error while adding user:" + err.message);
+  }
+});
+```
+
+# API's
+
+**https://mongoosejs.com/docs/api/model.html**
+
+- **FEED API:** Get API to get all the user
+
+  - We can use mongoose model given functions to get or find the data from the database
 
   ```javascript
-  // example creating a user schema & model,
-  // /models/user.js
-  const mongoose = require("mongoose");
-  const userSchema = new mongoose.Schema({
+  const User = require("./models/user");
+  app.get("/feed", async (req, res) => {
+    try {
+      const users = await User.find({});
+      res.send(users);
+    } catch (err) {
+      res.status(400).send("Error while fetching users:" + err.message);
+    }
+  });
+  ```
+
+  - To Get user by email
+
+  ```javascript
+  const userEmail = req.body.email;
+  const users = await User.find({ emailId: userEmail });
+  res.send(users);
+  ```
+
+- **Delete API** - to delete the user by userId
+
+  ```javascript
+  app.delete("/user", async (req, res) => {
+    const userId = req.body.userId;
+    try {
+      // const user = await User.findByIdAndDelete({ _id: userId }); Both are correct
+      const user = await User.findByIdAndDelete(userId); // ({_id: userId}) === (userId)
+      if (!user) {
+        res.status(404).send("No user found with the given user id");
+      } else {
+        res.send("User deleted successfully");
+      }
+    } catch (err) {
+      res.status(400).send("Error while deleting user:" + err.message);
+    }
+  });
+  ```
+
+- **Update API** - to update the user data by userId
+  ```javascript
+  app.patch("/user", async (req, res) => {
+    const userId = req.body.userId;
+    const data = req.body;
+    try {
+      // First parameter is the id of the document to be updated and the second parameter is the data to be updated
+      // If in the data any extra field is added which is not in the schema then it will not be added to the document , It will be ignored
+      // returnDocument: "before" returns the document before the update is applied, optional but useful
+      const dataBefore = await User.findByIdAndUpdate(userId, data, {
+        returnDocument: "before",
+      });
+      console.log(dataBefore);
+      res.send("User updated successfully");
+    } catch (err) {
+      res.status(400).send("Error while updating user:" + err.message);
+    }
+  });
+  ```
+
+# Data Validation & Schema Sanitization
+
+- We can define some data validation like **required, minlength, maxlength** etc. inside the schema.
+- If the data is not provided as per the schema validation during insert/update, it will throw an error.
+- Example:-
+
+```javascript
+  "emailId": {
+    type: String,
+    required: true, // Ensures that the email is provided
+    unique: true, // Ensures that the email is unique
+    lowercase: true, // Converts the email to lowercase before saving it
+    trim: true, // Removes the extra spaces from the email
+  }
+```
+
+- We can also add validate function to the fields which validates the data but validates only works when the new data is added to the database and if we try to update the data then it will not validate the data so we need to use the middleware for that and need to send runValidators to be true to the options in the models method where the api definitions defines.
+
+```javascript
+  "gender": {
+    type: String,
+    validate(value) {
+      if (!["male", "female", "others"].includes(value)) {
+        throw new Error("Gender data is invalid!!");
+      }
+    }
+  }
+```
+
+```javascript
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    await User.findByIdAndUpdate(userId, data, {
+      runValidators: true, // run the validators on the update operation
+    });
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(400).send("Error while updating user:" + err.message);
+  }
+});
+```
+
+- If we can add timestamps to be true inside the schema then mongodb will automatically add createdAt and updatedAt timestamp into the documents / database.
+
+```javascript
+const userSchema = new mongoose.Schema(
+  {
     firstName: {
-      type: String,
+      type: "string",
     },
-    lastName: {
-      type: String,
-    },
-  });
-  module.exports = mongoose.model("User", userSchema);
+  },
+  {
+    timestamps: true,
+  }
+);
+```
 
-  // app.js
-  // creating first signup API to signup a user
-  app.post("/signup", async (req, res) => {
-    // Creating a new instance of the User model
-    const userObj = {
-      firstName: "Sachin",
-      lastName: "Tendulkar",
-      emailId: "sachin@tendulkar.com",
-      password: "sachin@123",
-    };
-    try {
-      const user = new User(userObj);
-      await user.save();
-      res.send("User added successfully");
-    } catch (err) {
-      res.status(400).send("Error while adding user:" + err.message);
+- We can also add API level data sanitization. eg:-
+
+```javascript
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
+  const data = req.body;
+  try {
+    // only updates of below fields allowed else it will throw error
+    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Invalid updates provided!!");
     }
-  });
-  ```
+    if (data?.skills.length > 10) {
+      throw new Error("Skills cannot be more than 10");
+    }
+    const dataAfterUpdate = await User.findByIdAndUpdate(userId, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+    if (!dataAfterUpdate) {
+      throw new Error("No user found with the given user id");
+    }
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(400).send("Error while updating user:" + err.message);
+  }
+});
+```
 
-  - **If the any key on userobj/request body is wrong, then it will be filter by the User model and it will not save into the DB**
+- **We can also use external library (validator) to validate the incoming data from user, which we can add either at schema level validation or API level validation**
 
-  - Now if to take request body from the user for POST API then we will get the data in (req, res). But data is in form of JSON and JSON format is not supported/readable in the request handler then we can use one **Middleware** to convert that JSON Data into the Javascript object
-  - To Convert JSON Data into JS object, Express given us one middleware **express.json()**
+  - **npm install validator**
 
   ```javascript
-  // Middleware to parse the request body
-  app.use(express.json());
+    const validator = require("validator");
 
-  // API to signup a user
-  app.post("/signup", async (req, res) => {
-    // Creating a new instance of the User model
-    const user = new User(req.body);
-    try {
-      await user.save();
-      res.send("User added successfully");
-    } catch (err) {
-      res.status(400).send("Error while adding user:" + err.message);
-    }
-  });
-  ```
-
-  # API's
-
-  **https://mongoosejs.com/docs/api/model.html**
-
-  - **FEED API:** Get API to get all the user
-
-    - We can use mongoose model given functions to get or find the data from the database
-
-    ```javascript
-    const User = require("./models/user");
-    app.get("/feed", async (req, res) => {
-      try {
-        const users = await User.find({});
-        res.send(users);
-      } catch (err) {
-        res.status(400).send("Error while fetching users:" + err.message);
-      }
-    });
-    ```
-
-    - To Get user by email
-
-    ```javascript
-    const userEmail = req.body.email;
-    const users = await User.find({ emailId: userEmail });
-    res.send(users);
-    ```
-
-  - **Delete API** - to delete the user by userId
-
-    ```javascript
-    app.delete("/user", async (req, res) => {
-      const userId = req.body.userId;
-      try {
-        // const user = await User.findByIdAndDelete({ _id: userId }); Both are correct
-        const user = await User.findByIdAndDelete(userId); // ({_id: userId}) === (userId)
-        if (!user) {
-          res.status(404).send("No user found with the given user id");
-        } else {
-          res.send("User deleted successfully");
-        }
-      } catch (err) {
-        res.status(400).send("Error while deleting user:" + err.message);
-      }
-    });
-    ```
-
-  - **Update API** - to update the user data by userId
-    ```javascript
-    app.patch("/user", async (req, res) => {
-      const userId = req.body.userId;
-      const data = req.body;
-      try {
-        // First parameter is the id of the document to be updated and the second parameter is the data to be updated
-        // If in the data any extra field is added which is not in the schema then it will not be added to the document , It will be ignored
-        // returnDocument: "before" returns the document before the update is applied, optional but useful
-        const dataBefore = await User.findByIdAndUpdate(userId, data, {
-          returnDocument: "before",
-        });
-        console.log(dataBefore);
-        res.send("User updated successfully");
-      } catch (err) {
-        res.status(400).send("Error while updating user:" + err.message);
-      }
-    });
-    ```
-
-  # Data Validation & Schema Sanitization
-
-  - We can define some data validation like **required, minlength, maxlength** etc. inside the schema.
-  - If the data is not provided as per the schema validation during insert/update, it will throw an error.
-  - Example:-
-
-  ```javascript
     "emailId": {
       type: String,
       required: true, // Ensures that the email is provided
       unique: true, // Ensures that the email is unique
       lowercase: true, // Converts the email to lowercase before saving it
       trim: true, // Removes the extra spaces from the email
-    }
-  ```
-
-  - We can also add validate function to the fields which validates the data but validates only works when the new data is added to the database and if we try to update the data then it will not validate the data so we need to use the middleware for that and need to send runValidators to be true to the options in the models method where the api definitions defines.
-
-  ```javascript
-    "gender": {
-      type: String,
       validate(value) {
-        if (!["male", "female", "others"].includes(value)) {
-          throw new Error("Gender data is invalid!!");
+        // Use to validate the email provided by the user is valid or not, using validator
+        if (!validator.isEmail(value)) {
+          throw new Error("Email is invalid!!");
         }
       }
-    }
-  ```
-
-  ```javascript
-  app.patch("/user", async (req, res) => {
-    const userId = req.body.userId;
-    const data = req.body;
-    try {
-      await User.findByIdAndUpdate(userId, data, {
-        runValidators: true, // run the validators on the update operation
-      });
-      res.send("User updated successfully");
-    } catch (err) {
-      res.status(400).send("Error while updating user:" + err.message);
-    }
-  });
-  ```
-
-  - If we can add timestamps to be true inside the schema then mongodb will automatically add createdAt and updatedAt timestamp into the documents / database.
-
-  ```javascript
-  const userSchema = new mongoose.Schema(
-    {
-      firstName: {
-        type: "string",
-      },
     },
-    {
-      timestamps: true,
-    }
-  );
   ```
 
-  - We can also add API level data sanitization. eg:-
+**NOTE: NEVER TRUST REQ.BODY**
 
-  ```javascript
-  app.patch("/user/:userId", async (req, res) => {
-    const userId = req.params?.userId;
-    const data = req.body;
-    try {
-      // only updates of below fields allowed else it will throw error
-      const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
-      const isUpdateAllowed = Object.keys(data).every((k) =>
-        ALLOWED_UPDATES.includes(k)
-      );
-      if (!isUpdateAllowed) {
-        throw new Error("Invalid updates provided!!");
-      }
-      if (data?.skills.length > 10) {
-        throw new Error("Skills cannot be more than 10");
-      }
-      const dataAfterUpdate = await User.findByIdAndUpdate(userId, data, {
-        returnDocument: "after",
-        runValidators: true,
-      });
-      if (!dataAfterUpdate) {
-        throw new Error("No user found with the given user id");
-      }
-      res.send("User updated successfully");
-    } catch (err) {
-      res.status(400).send("Error while updating user:" + err.message);
-    }
-  });
-  ```
+# Password Encryption & Decryption
 
-  - **We can also use external library (validator) to validate the incoming data from user, which we can add either at schema level validation or API level validation**
-    - **npm install validator**
+- Cannot store signup password directly in the document db so need to store in the encrypted form.
+- Before Encrypting the data, first we have to validate the signup data
+  - Create Separate file validation.js inside utils folder for req.body data validation
     ```javascript
       const validator = require("validator");
+      const validateSignUpData = (req) => {
+        const { firstName, lastName, emailId, password } = req.body;
 
-      "emailId": {
-        type: String,
-        required: true, // Ensures that the email is provided
-        unique: true, // Ensures that the email is unique
-        lowercase: true, // Converts the email to lowercase before saving it
-        trim: true, // Removes the extra spaces from the email
-        validate(value) {
-          // Use to validate the email provided by the user is valid or not, using validator
-          if (!validator.isEmail(value)) {
-            throw new Error("Email is invalid!!");
-          }
+        if (!firstName || !lastName) {
+          throw new Error("First Name and Last Name are mandatory fields");
+        } else if (!validator.isEmail(emailId)) {
+          throw new Error("Email is invalid!!");
+        } else if (!validator.isStrongPassword(password)) {
+          throw new Error("Password is not strong!!");
         }
-      },
+      };
+      module.exports = {
+        validateSignUpData,
+      };
     ```
+  - We can import this function in app.js and use in the **/signup** api definition and after validation, we have to encrypt the password using the external library npm package **bcrypt**.
+    - **npm install bcrypt**
+    ```javascript
+      app.post("/signup", async (req, res) => {
+      try {
+        // Validate the request body
+        validateSignUpData(req);
 
-  **NOTE: NEVER TRUST REQ.BODY**
+        const { firstName, lastName, emailId, password } = req.body;
+        // Encrypt the password using bcrypt
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({
+          firstName,
+          lastName,
+          emailId,
+          password: hashedPassword,
+        });
+        await user.save();
+        res.send("User added successfully");
+      } catch (err) {
+        res.status(400).send("ERROR:" + err.message);
+      }
+    });
+    ```
