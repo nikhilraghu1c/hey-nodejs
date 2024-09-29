@@ -356,3 +356,56 @@
     });
     ```
 
+  # Data Validation
+    - We can define some data validation like **required, minlength, maxlength** etc. inside the schema.
+    - If the data is not provided as per the schema validation during insert/update, it will throw an error.
+    - Example:-
+    ```javascript
+      "emailId": {
+        type: String,
+        required: true, // Ensures that the email is provided
+        unique: true, // Ensures that the email is unique
+        lowercase: true, // Converts the email to lowercase before saving it
+        trim: true, // Removes the extra spaces from the email
+      }
+    ```
+    - We can also add validate function to the fields which validates the data but validates only works when the new data is added to the database and if we try to update the data then it will not validate the data so we need to use the middleware for that and need to send runValidators to be true to the options in the models method where the api definitions defines.
+    ```javascript
+      "gender": {
+        type: String,
+        validate(value) { 
+          if (!["male", "female", "others"].includes(value)) {
+            throw new Error("Gender data is invalid!!");
+          }
+        }
+      }
+    ```
+    ```javascript
+      app.patch("/user", async (req, res) => {
+        const userId = req.body.userId;
+        const data = req.body;
+        try {
+          await User.findByIdAndUpdate(userId, data, {
+            runValidators: true, // run the validators on the update operation
+          });
+          res.send("User updated successfully");
+        } catch (err) {
+          res.status(400).send("Error while updating user:" + err.message);
+        }
+      });
+    ```
+
+    - If we can add timestamps to be true inside the schema then mongodb will automatically add createdOn and updatedOn timestamp into the documents / database.
+    ```javascript
+      const userSchema = new mongoose.Schema(
+        {
+          firstName: {
+            type: "string"
+          }
+        },
+        {
+          timestamps: true
+        }
+      )
+    ``` 
+
