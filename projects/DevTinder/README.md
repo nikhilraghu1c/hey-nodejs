@@ -297,48 +297,53 @@
   # API's
 
   **https://mongoosejs.com/docs/api/model.html**
-  
+
   - **FEED API:** Get API to get all the user
-    - We can use mongoose model given functions to get or find the data from the database 
+
+    - We can use mongoose model given functions to get or find the data from the database
+
     ```javascript
-      const User = require("./models/user");
-      app.get("/feed", async (req, res) => {
-        try {
-          const users = await User.find({});
-          res.send(users);
-        } catch (err) {
-          res.status(400).send("Error while fetching users:" + err.message);
-        }
-      });
+    const User = require("./models/user");
+    app.get("/feed", async (req, res) => {
+      try {
+        const users = await User.find({});
+        res.send(users);
+      } catch (err) {
+        res.status(400).send("Error while fetching users:" + err.message);
+      }
+    });
     ```
 
-    - To Get user by email 
+    - To Get user by email
+
     ```javascript
-        const userEmail = req.body.email;
-        const users = await User.find({ emailId: userEmail });
-         res.send(users);
+    const userEmail = req.body.email;
+    const users = await User.find({ emailId: userEmail });
+    res.send(users);
     ```
+
   - **Delete API** - to delete the user by userId
+
     ```javascript
-      app.delete("/user", async(req, res) => {
-        const userId = req.body.userId;
-        try {
-          // const user = await User.findByIdAndDelete({ _id: userId }); Both are correct
-          const user = await User.findByIdAndDelete(userId); // ({_id: userId}) === (userId)
-          if (!user) {
-            res.status(404).send("No user found with the given user id");
-          } else {
-            res.send("User deleted successfully");
-          }
-        } catch (err) {
-          res.status(400).send("Error while deleting user:" + err.message);
+    app.delete("/user", async (req, res) => {
+      const userId = req.body.userId;
+      try {
+        // const user = await User.findByIdAndDelete({ _id: userId }); Both are correct
+        const user = await User.findByIdAndDelete(userId); // ({_id: userId}) === (userId)
+        if (!user) {
+          res.status(404).send("No user found with the given user id");
+        } else {
+          res.send("User deleted successfully");
         }
-      });
+      } catch (err) {
+        res.status(400).send("Error while deleting user:" + err.message);
+      }
+    });
     ```
 
   - **Update API** - to update the user data by userId
     ```javascript
-      app.patch("/user", async (req, res) => {
+    app.patch("/user", async (req, res) => {
       const userId = req.body.userId;
       const data = req.body;
       try {
@@ -356,56 +361,93 @@
     });
     ```
 
-  # Data Validation
-    - We can define some data validation like **required, minlength, maxlength** etc. inside the schema.
-    - If the data is not provided as per the schema validation during insert/update, it will throw an error.
-    - Example:-
-    ```javascript
-      "emailId": {
-        type: String,
-        required: true, // Ensures that the email is provided
-        unique: true, // Ensures that the email is unique
-        lowercase: true, // Converts the email to lowercase before saving it
-        trim: true, // Removes the extra spaces from the email
-      }
-    ```
-    - We can also add validate function to the fields which validates the data but validates only works when the new data is added to the database and if we try to update the data then it will not validate the data so we need to use the middleware for that and need to send runValidators to be true to the options in the models method where the api definitions defines.
-    ```javascript
-      "gender": {
-        type: String,
-        validate(value) { 
-          if (!["male", "female", "others"].includes(value)) {
-            throw new Error("Gender data is invalid!!");
-          }
+  # Data Validation & Schema Sanitization
+
+  - We can define some data validation like **required, minlength, maxlength** etc. inside the schema.
+  - If the data is not provided as per the schema validation during insert/update, it will throw an error.
+  - Example:-
+
+  ```javascript
+    "emailId": {
+      type: String,
+      required: true, // Ensures that the email is provided
+      unique: true, // Ensures that the email is unique
+      lowercase: true, // Converts the email to lowercase before saving it
+      trim: true, // Removes the extra spaces from the email
+    }
+  ```
+
+  - We can also add validate function to the fields which validates the data but validates only works when the new data is added to the database and if we try to update the data then it will not validate the data so we need to use the middleware for that and need to send runValidators to be true to the options in the models method where the api definitions defines.
+
+  ```javascript
+    "gender": {
+      type: String,
+      validate(value) {
+        if (!["male", "female", "others"].includes(value)) {
+          throw new Error("Gender data is invalid!!");
         }
       }
-    ```
-    ```javascript
-      app.patch("/user", async (req, res) => {
-        const userId = req.body.userId;
-        const data = req.body;
-        try {
-          await User.findByIdAndUpdate(userId, data, {
-            runValidators: true, // run the validators on the update operation
-          });
-          res.send("User updated successfully");
-        } catch (err) {
-          res.status(400).send("Error while updating user:" + err.message);
-        }
+    }
+  ```
+
+  ```javascript
+  app.patch("/user", async (req, res) => {
+    const userId = req.body.userId;
+    const data = req.body;
+    try {
+      await User.findByIdAndUpdate(userId, data, {
+        runValidators: true, // run the validators on the update operation
       });
-    ```
+      res.send("User updated successfully");
+    } catch (err) {
+      res.status(400).send("Error while updating user:" + err.message);
+    }
+  });
+  ```
 
-    - If we can add timestamps to be true inside the schema then mongodb will automatically add createdOn and updatedOn timestamp into the documents / database.
-    ```javascript
-      const userSchema = new mongoose.Schema(
-        {
-          firstName: {
-            type: "string"
-          }
-        },
-        {
-          timestamps: true
-        }
-      )
-    ``` 
+  - If we can add timestamps to be true inside the schema then mongodb will automatically add createdOn and updatedOn timestamp into the documents / database.
 
+  ```javascript
+  const userSchema = new mongoose.Schema(
+    {
+      firstName: {
+        type: "string",
+      },
+    },
+    {
+      timestamps: true,
+    }
+  );
+  ```
+
+  - We can also add API level data sanitization. eg:-
+
+  ```javascript
+  app.patch("/user/:userId", async (req, res) => {
+    const userId = req.params?.userId;
+    const data = req.body;
+    try {
+      // only updates of below fields allowed else it will throw error
+      const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+      const isUpdateAllowed = Object.keys(data).every((k) =>
+        ALLOWED_UPDATES.includes(k)
+      );
+      if (!isUpdateAllowed) {
+        throw new Error("Invalid updates provided!!");
+      }
+      if (data?.skills.length > 10) {
+        throw new Error("Skills cannot be more than 10");
+      }
+      const dataAfterUpdate = await User.findByIdAndUpdate(userId, data, {
+        returnDocument: "after",
+        runValidators: true,
+      });
+      if (!dataAfterUpdate) {
+        throw new Error("No user found with the given user id");
+      }
+      res.send("User updated successfully");
+    } catch (err) {
+      res.status(400).send("Error while updating user:" + err.message);
+    }
+  });
+  ```
