@@ -405,7 +405,7 @@
   });
   ```
 
-  - If we can add timestamps to be true inside the schema then mongodb will automatically add createdOn and updatedOn timestamp into the documents / database.
+  - If we can add timestamps to be true inside the schema then mongodb will automatically add createdAt and updatedAt timestamp into the documents / database.
 
   ```javascript
   const userSchema = new mongoose.Schema(
@@ -451,3 +451,23 @@
     }
   });
   ```
+
+  - **We can also use external library (validator) to validate the incoming data from user, which we can add either at schema level validation or API level validation**
+    - **npm install validator**
+    ```javascript
+      const validator = require("validator");
+
+      "emailId": {
+        type: String,
+        required: true, // Ensures that the email is provided
+        unique: true, // Ensures that the email is unique
+        lowercase: true, // Converts the email to lowercase before saving it
+        trim: true, // Removes the extra spaces from the email
+        validate(value) {
+          // Use to validate the email provided by the user is valid or not, using validator
+          if (!validator.isEmail(value)) {
+            throw new Error("Email is invalid!!");
+          }
+        }
+      },
+    ```

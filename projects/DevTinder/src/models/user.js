@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true, // 
+      required: true, //
       minLength: 4,
-      maxLength: 50
+      maxLength: 50,
     },
     lastName: {
       type: String,
@@ -17,18 +18,28 @@ const userSchema = new mongoose.Schema(
       unique: true, // Ensures that the email is unique
       lowercase: true, // Converts the email to lowercase before saving it
       trim: true, // Removes the extra spaces from the email
+      validate(value) { // use to validate the value provided by the user is valid or not
+        // Use to validate the email provided by the user is valid or not , using validator
+        if (!validator.isEmail(value)) {
+          throw new Error("Email is invalid!!");
+        }
+      },
     },
     password: {
       type: String,
       required: true,
+      validate(value) {
+        if(!validator.isStrongPassword(value)) {
+          throw new Error("Password is not strong!!");
+        }
+      }
     },
     age: {
       type: Number,
     },
     gender: {
       type: String,
-      validate(value) { 
-        // Use to validate the gender data provided by the user is valid or not
+      validate(value) {
         if (!["male", "female", "others"].includes(value)) {
           throw new Error("Gender data is invalid!!");
         }
@@ -37,6 +48,11 @@ const userSchema = new mongoose.Schema(
     photoUrl: {
       type: String,
       default: "https://geographyandyou.com/images/user-profile.png", // Default image for the user
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Photo URL is invalid!!");
+        }
+      },
     },
     about: {
       type: String,
@@ -44,6 +60,11 @@ const userSchema = new mongoose.Schema(
     },
     skills: {
       type: [String],
+      validate(value) {
+        if (value.length > 10) {
+          throw new Error("Skills cannot be more than 10!!");
+        }
+      }
     },
   },
   {
