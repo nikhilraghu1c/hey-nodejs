@@ -2,8 +2,9 @@ const express = require("express");
 const { connectDB } = require("./config/database");
 const app = express();
 const User = require("./models/user");
-const { validateSignUpData } = require("./utils/validation");
+const { validateSignUpData, validateLoginData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const validator = require("validator");
 
 /** Middleware to parse the request body */
 app.use(express.json());
@@ -26,6 +27,26 @@ app.post("/signup", async (req, res) => {
     });
     await user.save();
     res.send("User added successfully");
+  } catch (err) {
+    res.status(400).send("ERROR:" + err.message);
+  }
+});
+
+/** API to login a user */
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    validateLoginData(req);
+    const user = await User.findOne({ emailId });
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error("Invalid credentials");
+    } else {
+      res.send("User logged in successfully");
+    }
   } catch (err) {
     res.status(400).send("ERROR:" + err.message);
   }

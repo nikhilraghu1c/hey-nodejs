@@ -522,3 +522,31 @@ app.patch("/user/:userId", async (req, res) => {
       }
     });
     ```
+
+- **Login API:** Create a login api in which we will compare the password using bcrypt
+  1. Validate the login user data if invalid data found then throw error
+  2. If login data is valid then get the user by emailId using **User.findOne** methodand check user exists or not, if not exists then throw the error 
+  3. If user exists then check the password which client enter is correct or not. We can check this by using **bcrypt.compare** method
+  4. **bcrypt.compare(myPlainTextPassword , userHashPasswordStoredInDB)**
+  5. **Always throw Invalid credentials error if any validation not match in case of invalid emailId or password. Don't throw Email and Password not found error for security reasons.**
+  **Example:-**
+  ```javascript
+    app.post("/login", async (req, res) => {
+      try {
+        const { emailId, password } = req.body;
+        validateLoginData(req); // function validate data and throw error if invalid function found
+        const user = await User.findOne({ emailId });
+        if (!user) {
+          throw new Error("Invalid credentials");
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+          throw new Error("Invalid credentials");
+        } else {
+          res.send("User logged in successfully");
+        }
+      } catch (err) {
+        res.status(400).send("ERROR:" + err.message);
+      }
+    });
+  ```
