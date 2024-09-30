@@ -627,8 +627,8 @@ app.patch("/user/:userId", async (req, res) => {
 - In above we have to write user authentication logic to every api, so instead of this we can create one middleware **auth.js** and use it in every api. In that middleware it will get the JWT token from the cookies and validate the JWT token and then we will allow the user to access the api
   - **Example:-**
     ```javascript
-      // Middleware auth.js
-      const userAuth = async (req, res, next) => {
+    // Middleware auth.js
+    const userAuth = async (req, res, next) => {
       try {
         const { token } = req.cookies;
         if (!token) {
@@ -650,3 +650,34 @@ app.patch("/user/:userId", async (req, res) => {
     };
     ```
 - **To set the expire of JWT token and cookies , we can use the expiresIn option in jwt.sign() method and expires option in res.cookie() method**.
+
+- **Mongoose Schema Methods:**
+
+  - Right now all JWT creation and validate password are written in the app.js file, but we can move it to the model file as well to make it more modular and clean code structure. In the userSchema model, we can add a method to generate the JWT token and validate the password.
+
+  ```javascript
+  /** ./model/user.js */
+
+  // Method to get the JWT token
+  userSchema.methods.getJWT = async function () {
+    // this only works with normal functions and refers to the current user
+    const user = this;
+    const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$7777", {
+      expiresIn: "1d",
+    });
+    return token;
+  };
+
+  userSchema.methods.validatePassword = async function (passwordInputByUser) {
+    const user = this;
+    const passwordHash = user.password;
+    return await bcrypt.compare(passwordInputByUser, passwordHash);
+  };
+
+  /** ./app.js */
+  const user = await User.findOne({ emailId });
+  const isPasswordValid = await user.validatePassword(password);
+  if (isPasswordValid) {
+    const token = await user.getJWT();
+  }
+  ```
