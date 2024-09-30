@@ -6,6 +6,7 @@ const { validateSignUpData, validateLoginData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 /** Middleware to parse the request body */
 app.use(express.json());
@@ -45,8 +46,10 @@ app.post("/login", async (req, res) => {
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (isPasswordValid) {
-      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$7777");
-      res.cookie("token", token);
+      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$7777", {
+        expiresIn: "1d",
+      });
+      res.cookie("token", token, { expires: new Date(Date.now() + 2 * 86400000) });
       res.send("User logged in successfully");
     } else {
       throw new Error("Invalid credentials");
@@ -56,90 +59,19 @@ app.post("/login", async (req, res) => {
   }
 });
 
-/** Profile API */
-app.get("/profile", async (req, res) => {
+/** Get Login User Profile API */
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { token } = cookies;
-    if(!token) {
-      throw new Error("Invalid token");
-    }
-    // Check if the token is valid
-    const decodedMessage = jwt.verify(token, "DEV@Tinder$7777");
-    const { _id } = decodedMessage;
-    const user = await User.findById(_id);
-    if(!user) {
-      throw new Error("User not found");
-    }
-    res.send(user);
+    res.send(req.user);
   } catch (err) {
     res.status(400).send("ERROR:" + err.message);
   }
 });
 
-/** GET user by email id */
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.email;
-  try {
-    const users = await User.find({ emailId: userEmail });
-    if (users.length === 0) {
-      res.status(404).send("No user found with the given email id");
-    } else {
-      res.send(users);
-    }
-  } catch (err) {
-    res.status(400).send("Error while fetching user:" + err.message);
-  }
-});
-
-/** Feed API - GET API to get all users */
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(400).send("Error while fetching users:" + err.message);
-  }
-});
-
-/** Delete API - to delete the user by userId */
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const user = await User.findByIdAndDelete(userId);
-    if (!user) {
-      res.status(404).send("No user found with the given user id");
-    } else {
-      res.send("User deleted successfully");
-    }
-  } catch (err) {
-    res.status(400).send("Error while deleting user:" + err.message);
-  }
-});
-
-/** Update API - to update the data of the user */
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-  try {
-    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-    if (!isUpdateAllowed) {
-      throw new Error("Invalid updates provided!!");
-    }
-    const dataAfterUpdate = await User.findByIdAndUpdate(userId, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    if (!dataAfterUpdate) {
-      throw new Error("No user found with the given user id");
-    }
-    res.send("User updated successfully");
-  } catch (err) {
-    res.status(400).send("Error while updating user:" + err.message);
-  }
+/** Send Connection Request */
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const user = req.user;
+  res.send(user.firstName + " Connection request sent successfully");
 });
 
 /** Connect to the database and start the server */
@@ -153,8 +85,3 @@ connectDB()
   .catch((err) => {
     console.log("Unable to connect to database cluster!!");
   });
-
-
-
-
-
