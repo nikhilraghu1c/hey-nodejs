@@ -550,3 +550,70 @@ app.patch("/user/:userId", async (req, res) => {
       }
     });
   ```
+
+# JSON Web Token (JWT) , Authentication & Cookies
+
+- **JWT:-**
+  - An open industry standard (RFC 7519) method for representing claims securely between two parties.
+  - JWT token consists of three parts: Header, Payload, and Signature.
+  - Header: Contains the type of token and the hashing algorithm used.
+  - Payload: Contains the claims. Claims are statements about an entity (typically, the user) and additional data.
+  - Signature: Used to verify that the sender of the JWT is who it says it is and to ensure that the message wasn't changed along the way.
+  - JWT.IO allows you to decode, verify and generate JWT.
+  - **npm i jsonwebtoken**
+
+- After login, For every api call, we need to check every api call which is coming from the user is authenticated or not.
+
+- For that we will use JWT token to authenticate the user. So Everytime we call the api then we will get the token from the user and then we will verify the token and then we will allow the user to access the api.
+
+- Browser stores the token in the cookies and then we will get the token from the cookies and then we will verify the token and then we will allow the user to access the api. we can also set the expiry time for the token.
+
+- We need to create a JWT token using another package called **jsonwebtoken** using **jwt.sign({ _id: user._id }, "SecretKey")**.
+
+- After that we need to set the token in the cookie using **res.cookie("token", token)**.
+
+- After token set in cookie, When we hit another api then first we get the cookie from the request **req.cookies**, then cookies is not parsed so we need to parse it using **cookie-parser** middleware. 
+  ```javascript
+    const cookieParser = require("cookie-parser");
+    app.use(cookieParser());
+  ```
+
+- After cookie parsing , we will get the token in the request object as req.cookies.token and then we will verify this token using jwt.verify method. 
+
+- **jwt.verify(token, "SecretKey")**  will return the decoded message if the token is valid.
+
+- If the token is valid, we will get the decoded message and then we will find the user using the _id from the decoded message. If the user is found, we will send the user data in the response.
+
+- Example:- 
+  ```javascript
+    app.post("/login", async (req, res) => {
+      try {
+        // ........
+        if (isPasswordValid) {
+          const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$7777");
+          res.cookie("token", token);
+          res.send("User logged in successfully");
+        } 
+        // ........
+      }
+    });
+
+    app.get("/profile", async (req, res) => {
+      try {
+        const { token } = req.cookies;
+        if(!token) {
+          throw new Error("Invalid token");
+        }
+        // Check if the token is valid
+        const decodedMessage = jwt.verify(token, "DEV@Tinder$7777");
+        const { _id } = decodedMessage;
+        const user = await User.findById(_id);
+        if(!user) {
+          throw new Error("User not found");
+        }
+        res.send(user);
+      }
+    });
+  ```
+
+- 
