@@ -681,3 +681,30 @@ app.patch("/user/:userId", async (req, res) => {
     const token = await user.getJWT();
   }
   ```
+
+# Express Routers
+
+- Express router use to define the routes in the application , Right now we have defined the routes in the app.js file itself. But as the application grows, we can define the routes in separate files and use the express router to manage the routes.
+
+  - Example:-
+    -  Created Auth.js file in the routes folder to handle the authentication routes. The file contains two routes: one for user signup and another for user login.
+    ```javascript
+      // ./src/routes/auth.js
+      const express = require("express");
+      const authRouter = express.Router();
+      authRouter.post("/signup", async (req, res) => {
+        // Logic for signup
+      })
+      module.exports = authRouter
+
+      // src/app.js
+      /** Middleware to parse the request body */
+      app.use(express.json());
+      app.use(cookieParser());
+
+      /** Import all routes */
+      const authRouter = require("./routes/auth");
+      app.use("/", authRouter);
+    ```
+- Express router works as a middleware and routing system in Express applications. How it works is that it takes an instance of the Express module and returns a new router object. The router object has methods like get, post, put, delete, etc., to define routes in the application. The router object can be used to define routes for different parts of the application. For example, in the above code snippet, we have defined  routers for authentication. Router is defined with a specific base path, and the routes defined within the router are relative to that base path. This helps in organizing the code and keeping it modular. The routers are then mounted on the main Express app using the app.use() method. This way, the routes defined in the routers are accessible from the main app. This makes the code more readable and maintainable.
+

@@ -1,75 +1,20 @@
 const express = require("express");
 const { connectDB } = require("./config/database");
 const app = express();
-const User = require("./models/user");
-const { validateSignUpData, validateLoginData } = require("./utils/validation");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const { userAuth } = require("./middlewares/auth");
 
 /** Middleware to parse the request body */
 app.use(express.json());
 app.use(cookieParser());
 
-/** API to signup a user */
-app.post("/signup", async (req, res) => {
-  try {
-    // Validate the request body
-    validateSignUpData(req);
+/** Import all routes */
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/requests");
 
-    const { firstName, lastName, emailId, password } = req.body;
-    // Encrypt the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      password: hashedPassword,
-    });
-    await user.save();
-    res.send("User added successfully");
-  } catch (err) {
-    res.status(400).send("ERROR:" + err.message);
-  }
-});
-
-/** API to login a user */
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-    validateLoginData(req);
-    const user = await User.findOne({ emailId });
-    if (!user) {
-      throw new Error("Invalid credentials");
-    }
-    const isPasswordValid = await user.validatePassword(password);
-    if (isPasswordValid) {
-      const token = await user.getJWT();
-      res.cookie("token", token, { expires: new Date(Date.now() + 2 * 86400000) });
-      res.send("User logged in successfully");
-    } else {
-      throw new Error("Invalid credentials");
-    }
-  } catch (err) {
-    res.status(400).send("ERROR:" + err.message);
-  }
-});
-
-/** Get Login User Profile API */
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    res.send(req.user);
-  } catch (err) {
-    res.status(400).send("ERROR:" + err.message);
-  }
-});
-
-/** Send Connection Request */
-app.post("/sendConnectionRequest", userAuth, async (req, res) => {
-  const user = req.user;
-  res.send(user.firstName + " Connection request sent successfully");
-});
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 /** Connect to the database and start the server */
 connectDB()
@@ -82,3 +27,4 @@ connectDB()
   .catch((err) => {
     console.log("Unable to connect to database cluster!!");
   });
+
