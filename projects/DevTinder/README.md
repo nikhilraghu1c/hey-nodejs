@@ -694,7 +694,10 @@ app.patch("/user/:userId", async (req, res) => {
       const authRouter = express.Router();
       authRouter.post("/signup", async (req, res) => {
         // Logic for signup
-      })
+      });
+      authRouter.post("/login", async (req, res) => {
+        // logic for login
+      });
       module.exports = authRouter
 
       // src/app.js
