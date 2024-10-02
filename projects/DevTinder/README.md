@@ -711,3 +711,7 @@ app.patch("/user/:userId", async (req, res) => {
     ```
 - Express router works as a middleware and routing system in Express applications. How it works is that it takes an instance of the Express module and returns a new router object. The router object has methods like get, post, put, delete, etc., to define routes in the application. The router object can be used to define routes for different parts of the application. For example, in the above code snippet, we have defined  routers for authentication. Router is defined with a specific base path, and the routes defined within the router are relative to that base path. This helps in organizing the code and keeping it modular. The routers are then mounted on the main Express app using the app.use() method. This way, the routes defined in the routers are accessible from the main app. This makes the code more readable and maintainable.
 
+# API's
+  - For logout api, just need to clear the cookie by res.clearCookie("token").
+  - If you want to send the JSON in the api response then you can use **res.json()** method instead of **res.send()** method. **example: res.json({message: "User logged in successfully", data: user})**.
+
