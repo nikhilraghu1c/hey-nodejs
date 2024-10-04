@@ -24,6 +24,9 @@ const connectionRequestSchema = new mongoose.Schema(
   }
 );
 
+// Compound index optimization for faster query
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
+
 // Pre save hook to validate the connection request before saving it
 connectionRequestSchema.pre("save", async function (next){
     const connectionRequest = this;

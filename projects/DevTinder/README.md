@@ -764,4 +764,16 @@ app.patch("/user/:userId", async (req, res) => {
           });
         ``` 
 
+  ## Index In Mongoose
+    - Index in mongoose is a way to optimize the query performance. It is a data structure that improves the speed of data retrieval operations on a database table at the cost of additional writes and the use of more storage space to maintain the index data structure. Indexes are used to quickly locate data without having to search every row in a database table every time a database table is accessed. Indexes can be created using a single field or multiple fields in a collection. Indexes can be created using the createIndex() method in mongoose.
+    
+    - unique to be true in mongoose schema ensures that the email is unique and it automically creates an index on the email field
 
+    - index to be true is used to create an index on the field in the collection
+
+    - Compound index is used to create an index on multiple fields in the collection in mongoose schema. To create a compound index, pass an array of fields to the index key in the schema. For example, to create a compound index on the fromUserId and toUserId fields in the user collection, use the following code: 
+      **connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 })**
+    
+    - If there are millions of records in the collection and we want to search by fromUserId and toUserId then we can create a compound index on fromUserId and toUserId to make the search faster.
+
+    - Creating index on every field of the schema not recommended because it slows down the write operation and increases the size of the index file on the disk which can slow down the read operation as well as the index file is loaded in the memory for faster read operation and if the index file is large then it will take more time to load the index file in the memory which will slow down the read operation as well as the write operation. So, it is recommended to create index on the fields which are used in the query for filtering the data. 

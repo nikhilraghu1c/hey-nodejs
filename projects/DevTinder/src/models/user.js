@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     emailId: {
       type: String,
       required: true, // Ensures that the email is provided
-      unique: true, // Ensures that the email is unique
+      unique: true, // Ensures that the email is unique and it automically creates an index on the email field
       lowercase: true, // Converts the email to lowercase before saving it
       trim: true, // Removes the extra spaces from the email
       validate(value) {
