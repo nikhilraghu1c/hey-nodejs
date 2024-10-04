@@ -1,12 +1,64 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
+const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 
 const requestRouter = express.Router();
 
 /** Send Connection Request */
-requestRouter.post("/sendConnectionRequest", userAuth, async (req, res) => {
-  const user = req.user;
-  res.send(user.firstName + " Connection request sent successfully");
-});
+requestRouter.post(
+  "/request/send/:status/:toUserId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const fromUserId = req.user._id;
+      const toUserId = req.params.toUserId;
+      const status = req.params.status;
+
+      // Check user exists or not
+      const toUser = await User.findById(toUserId);
+      if (!toUser) {
+        throw new Error("User not found");
+      }
+
+      // Check if the user is trying to send request to himself
+      // This check is already done in the model using pre save hook
+      // if (fromUserId.toString() === toUserId.toString()) {
+      //   throw new Error("You cannot send request to yourself");
+      // }
+
+      const allowedStatus = ["ignored", "interested"];
+      if (!allowedStatus.includes(status)) {
+        throw new Error("Invalid status type: " + status);
+      }
+
+      // check if the connection request already exists
+      // $or is used to check if the connection request exists in both ways (fromUserId -> toUserId and toUserId -> fromUserId)
+      const existingConnectionRequest = await ConnectionRequest.findOne({
+        $or: [
+          { fromUserId, toUserId },
+          { fromUserId: toUserId, toUserId: fromUserId },
+        ],
+      });
+
+      if (existingConnectionRequest) {
+        throw new Error("Connection request already exists");
+      }
+
+      const connectionRequest = new ConnectionRequest({
+        fromUserId,
+        toUserId,
+        status,
+      });
+      const data = await connectionRequest.save();
+      res.json({
+        message:  req.user.firstName + " is " + status + " in " + toUser.firstName,
+        data,
+      });
+    } catch (error) {
+      res.status(400).send("Error: " + error.message);
+    }
+  }
+);
 
 module.exports = requestRouter;

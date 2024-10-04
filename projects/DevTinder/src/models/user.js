@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema(
       unique: true, // Ensures that the email is unique
       lowercase: true, // Converts the email to lowercase before saving it
       trim: true, // Removes the extra spaces from the email
-      validate(value) { // use to validate the value provided by the user is valid or not
+      validate(value) {
+        // use to validate the value provided by the user is valid or not
         // Use to validate the email provided by the user is valid or not , using validator
         if (!validator.isEmail(value)) {
           throw new Error("Email is invalid!!");
@@ -32,21 +33,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       validate(value) {
-        if(!validator.isStrongPassword(value)) {
+        if (!validator.isStrongPassword(value)) {
           throw new Error("Password is not strong!!");
         }
-      }
+      },
     },
     age: {
       type: Number,
     },
     gender: {
       type: String,
-      validate(value) {
-        if (!["male", "female", "others"].includes(value)) {
-          throw new Error("Gender data is invalid!!");
-        }
+      enum: {
+        values: ["male", "female", "other"],
+        message: `{VALUE} is incorrect gender type`,
       },
+      // validate(value) {
+      // this is a custom validator to validate the gender , works same as enum
+      //   if (!["male", "female", "others"].includes(value)) {
+      //     throw new Error("Gender data is invalid!!");
+      //   }
+      // },
     },
     photoUrl: {
       type: String,
@@ -67,7 +73,7 @@ const userSchema = new mongoose.Schema(
         if (value.length > 10) {
           throw new Error("Skills cannot be more than 10!!");
         }
-      }
+      },
     },
   },
   {
@@ -77,7 +83,7 @@ const userSchema = new mongoose.Schema(
 
 /** Method to get the JWT token */
 userSchema.methods.getJWT = async function () {
-  const user = this; 
+  const user = this;
   const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$7777", {
     expiresIn: "1d",
   });

@@ -714,4 +714,54 @@ app.patch("/user/:userId", async (req, res) => {
 # API's
   - For logout api, just need to clear the cookie by res.clearCookie("token").
   - If you want to send the JSON in the api response then you can use **res.json()** method instead of **res.send()** method. **example: res.json({message: "User logged in successfully", data: user})**.
+  - Instead of validate in the schema , we can also define enum for the fixed value type
+  ```javascript
+    "gender": {
+      type: String,
+      enum: {
+        values: ["male", "female", "other"],
+        message: `{VALUE} is incorrect gender type`,
+      },
+      validate(value) {
+      // this is a custom validator to validate the gender , works same as enum
+        if (!["male", "female", "others"].includes(value)) {
+          throw new Error("Gender data is invalid!!");
+        }
+      },
+    },
+  ```
+  ## Connection Request's API
+
+  - Need to create a new schema for the connection request API's. We will store all this connection info into the different collection.
+  - Created new Schema **connectionRequestSchema** in the models **"connectionRequest.js"**.
+  - **"/request/send/:status/:toUserId"**
+    - Condition Needs to check before saving the [ignored, interested] status between two user.
+      1. Check user exists or not (toUserId)
+      2. check if the connection request already exists
+        - **$or** is used to check if the connection request exists in both ways (fromUserId -> toUserId and toUserId -> fromUserId)
+        - Example:-
+          ```javascript
+            const existingConnectionRequest = await ConnectionRequest.findOne({
+              $or: [
+                { fromUserId, toUserId },
+                { fromUserId: toUserId, toUserId: fromUserId },
+              ],
+            });
+          ```
+      3. Check if the user is trying to send request to himself
+
+    - We can also add these either in api level or mongoose provide use **pre** hook which we can define in the model/Schema. It will be run and check the data before saving it.
+      - Example:-
+        ```javascript
+          // models/connectionRequest.js
+          connectionRequestSchema.pre("save", async function (next){
+            const connectionRequest = this;
+            // Check if fromUserId and toUserId are same
+            if(connectionRequest.fromUserId.equals(connectionRequest.toUserId)){
+                throw new Error("You cannot send request to yourself");
+            }
+            next();
+          });
+        ``` 
+
 
