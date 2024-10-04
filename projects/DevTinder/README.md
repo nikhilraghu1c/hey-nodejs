@@ -687,93 +687,104 @@ app.patch("/user/:userId", async (req, res) => {
 - Express router use to define the routes in the application , Right now we have defined the routes in the app.js file itself. But as the application grows, we can define the routes in separate files and use the express router to manage the routes.
 
   - Example:-
-    -  Created Auth.js file in the routes folder to handle the authentication routes. The file contains two routes: one for user signup and another for user login.
+
+    - Created Auth.js file in the routes folder to handle the authentication routes. The file contains two routes: one for user signup and another for user login.
+
     ```javascript
-      // ./src/routes/auth.js
-      const express = require("express");
-      const authRouter = express.Router();
-      authRouter.post("/signup", async (req, res) => {
-        // Logic for signup
-      });
-      authRouter.post("/login", async (req, res) => {
-        // logic for login
-      });
-      module.exports = authRouter
+    // ./src/routes/auth.js
+    const express = require("express");
+    const authRouter = express.Router();
+    authRouter.post("/signup", async (req, res) => {
+      // Logic for signup
+    });
+    authRouter.post("/login", async (req, res) => {
+      // logic for login
+    });
+    module.exports = authRouter;
 
-      // src/app.js
-      /** Middleware to parse the request body */
-      app.use(express.json());
-      app.use(cookieParser());
+    // src/app.js
+    /** Middleware to parse the request body */
+    app.use(express.json());
+    app.use(cookieParser());
 
-      /** Import all routes */
-      const authRouter = require("./routes/auth");
-      app.use("/", authRouter);
+    /** Import all routes */
+    const authRouter = require("./routes/auth");
+    app.use("/", authRouter);
     ```
-- Express router works as a middleware and routing system in Express applications. How it works is that it takes an instance of the Express module and returns a new router object. The router object has methods like get, post, put, delete, etc., to define routes in the application. The router object can be used to define routes for different parts of the application. For example, in the above code snippet, we have defined  routers for authentication. Router is defined with a specific base path, and the routes defined within the router are relative to that base path. This helps in organizing the code and keeping it modular. The routers are then mounted on the main Express app using the app.use() method. This way, the routes defined in the routers are accessible from the main app. This makes the code more readable and maintainable.
+
+- Express router works as a middleware and routing system in Express applications. How it works is that it takes an instance of the Express module and returns a new router object. The router object has methods like get, post, put, delete, etc., to define routes in the application. The router object can be used to define routes for different parts of the application. For example, in the above code snippet, we have defined routers for authentication. Router is defined with a specific base path, and the routes defined within the router are relative to that base path. This helps in organizing the code and keeping it modular. The routers are then mounted on the main Express app using the app.use() method. This way, the routes defined in the routers are accessible from the main app. This makes the code more readable and maintainable.
 
 # API's
-  - For logout api, just need to clear the cookie by res.clearCookie("token").
-  - If you want to send the JSON in the api response then you can use **res.json()** method instead of **res.send()** method. **example: res.json({message: "User logged in successfully", data: user})**.
-  - Instead of validate in the schema , we can also define enum for the fixed value type
-  ```javascript
-    "gender": {
-      type: String,
-      enum: {
-        values: ["male", "female", "other"],
-        message: `{VALUE} is incorrect gender type`,
-      },
-      validate(value) {
-      // this is a custom validator to validate the gender , works same as enum
-        if (!["male", "female", "others"].includes(value)) {
-          throw new Error("Gender data is invalid!!");
-        }
-      },
+
+- For logout api, just need to clear the cookie by res.clearCookie("token").
+- If you want to send the JSON in the api response then you can use **res.json()** method instead of **res.send()** method. **example: res.json({message: "User logged in successfully", data: user})**.
+- Instead of validate in the schema , we can also define enum for the fixed value type
+
+```javascript
+  "gender": {
+    type: String,
+    enum: {
+      values: ["male", "female", "other"],
+      message: `{VALUE} is incorrect gender type`,
     },
-  ```
-  ## Connection Request's API
+    validate(value) {
+    // this is a custom validator to validate the gender , works same as enum
+      if (!["male", "female", "others"].includes(value)) {
+        throw new Error("Gender data is invalid!!");
+      }
+    },
+  },
+```
 
-  - Need to create a new schema for the connection request API's. We will store all this connection info into the different collection.
-  - Created new Schema **connectionRequestSchema** in the models **"connectionRequest.js"**.
-  - **"/request/send/:status/:toUserId"**
-    - Condition Needs to check before saving the [ignored, interested] status between two user.
-      1. Check user exists or not (toUserId)
-      2. check if the connection request already exists
-        - **$or** is used to check if the connection request exists in both ways (fromUserId -> toUserId and toUserId -> fromUserId)
-        - Example:-
-          ```javascript
-            const existingConnectionRequest = await ConnectionRequest.findOne({
-              $or: [
-                { fromUserId, toUserId },
-                { fromUserId: toUserId, toUserId: fromUserId },
-              ],
-            });
-          ```
-      3. Check if the user is trying to send request to himself
+## Connection Request's API
 
-    - We can also add these either in api level or mongoose provide use **pre** hook which we can define in the model/Schema. It will be run and check the data before saving it.
-      - Example:-
-        ```javascript
-          // models/connectionRequest.js
-          connectionRequestSchema.pre("save", async function (next){
-            const connectionRequest = this;
-            // Check if fromUserId and toUserId are same
-            if(connectionRequest.fromUserId.equals(connectionRequest.toUserId)){
-                throw new Error("You cannot send request to yourself");
-            }
-            next();
-          });
-        ``` 
+- Need to create a new schema for the connection request API's. We will store all this connection info into the different collection.
+- Created new Schema **connectionRequestSchema** in the models **"connectionRequest.js"**.
+- **"/request/send/:status/:toUserId"**
 
-  ## Index In Mongoose
-    - Index in mongoose is a way to optimize the query performance. It is a data structure that improves the speed of data retrieval operations on a database table at the cost of additional writes and the use of more storage space to maintain the index data structure. Indexes are used to quickly locate data without having to search every row in a database table every time a database table is accessed. Indexes can be created using a single field or multiple fields in a collection. Indexes can be created using the createIndex() method in mongoose.
-    
-    - unique to be true in mongoose schema ensures that the email is unique and it automically creates an index on the email field
+  - Condition Needs to check before saving the [ignored, interested] status between two user.
 
-    - index to be true is used to create an index on the field in the collection
+    1. Check user exists or not (toUserId)
+    2. check if the connection request already exists
 
-    - Compound index is used to create an index on multiple fields in the collection in mongoose schema. To create a compound index, pass an array of fields to the index key in the schema. For example, to create a compound index on the fromUserId and toUserId fields in the user collection, use the following code: 
-      **connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 })**
-    
-    - If there are millions of records in the collection and we want to search by fromUserId and toUserId then we can create a compound index on fromUserId and toUserId to make the search faster.
+    - **$or** is used to check if the connection request exists in both ways (fromUserId -> toUserId and toUserId -> fromUserId)
+    - Example:-
+      ```javascript
+      const existingConnectionRequest = await ConnectionRequest.findOne({
+        $or: [
+          { fromUserId, toUserId },
+          { fromUserId: toUserId, toUserId: fromUserId },
+        ],
+      });
+      ```
 
-    - Creating index on every field of the schema not recommended because it slows down the write operation and increases the size of the index file on the disk which can slow down the read operation as well as the index file is loaded in the memory for faster read operation and if the index file is large then it will take more time to load the index file in the memory which will slow down the read operation as well as the write operation. So, it is recommended to create index on the fields which are used in the query for filtering the data. 
+    3. Check if the user is trying to send request to himself
+
+  - We can also add these either in api level or mongoose provide use **pre** hook which we can define in the model/Schema. It will be run and check the data before saving it.
+    - Example:-
+      ```javascript
+      // models/connectionRequest.js
+      connectionRequestSchema.pre("save", async function (next) {
+        const connectionRequest = this;
+        // Check if fromUserId and toUserId are same
+        if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
+          throw new Error("You cannot send request to yourself");
+        }
+        next();
+      });
+      ```
+
+## Index In Mongoose
+
+  - Index in mongoose is a way to optimize the query performance. It is a data structure that improves the speed of data retrieval operations on a database table at the cost of additional writes and the use of more storage space to maintain the index data structure. Indexes are used to quickly locate data without having to search every row in a database table every time a database table is accessed. Indexes can be created using a single field or multiple fields in a collection. Indexes can be created using the createIndex() method in mongoose.
+
+  - unique to be true in mongoose schema ensures that the email is unique and it automically creates an index on the email field
+
+  - index to be true is used to create an index on the field in the collection
+
+  - Compound index is used to create an index on multiple fields in the collection in mongoose schema. To create a compound index, pass an array of fields to the index key in the schema. For example, to create a compound index on the fromUserId and toUserId fields in the user collection, use the following code:
+    **connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 })**
+
+  - If there are millions of records in the collection and we want to search by fromUserId and toUserId then we can create a compound index on fromUserId and toUserId to make the search faster.
+
+  - Creating index on every field of the schema not recommended because it slows down the write operation and increases the size of the index file on the disk which can slow down the read operation as well as the index file is loaded in the memory for faster read operation and if the index file is large then it will take more time to load the index file in the memory which will slow down the read operation as well as the write operation. So, it is recommended to create index on the fields which are used in the query for filtering the data.
