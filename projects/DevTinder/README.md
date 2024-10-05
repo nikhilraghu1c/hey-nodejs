@@ -719,7 +719,7 @@ app.patch("/user/:userId", async (req, res) => {
 - For logout api, just need to clear the cookie by res.clearCookie("token").
 - If you want to send the JSON in the api response then you can use **res.json()** method instead of **res.send()** method. **example: res.json({message: "User logged in successfully", data: user})**.
 
-  **NOTE:-**Instead of validate in the schema , we can also define enum for the fixed value type
+  **NOTE:** Instead of validate in the schema , we can also define enum for the fixed value type
 
   ```javascript
     "gender": {
@@ -778,35 +778,68 @@ app.patch("/user/:userId", async (req, res) => {
 
 ## Index In Mongoose
 
-  - Index in mongoose is a way to optimize the query performance. It is a data structure that improves the speed of data retrieval operations on a database table at the cost of additional writes and the use of more storage space to maintain the index data structure. Indexes are used to quickly locate data without having to search every row in a database table every time a database table is accessed. Indexes can be created using a single field or multiple fields in a collection. Indexes can be created using the createIndex() method in mongoose.
+- Index in mongoose is a way to optimize the query performance. It is a data structure that improves the speed of data retrieval operations on a database table at the cost of additional writes and the use of more storage space to maintain the index data structure. Indexes are used to quickly locate data without having to search every row in a database table every time a database table is accessed. Indexes can be created using a single field or multiple fields in a collection. Indexes can be created using the createIndex() method in mongoose.
 
-  - unique to be true in mongoose schema ensures that the email is unique and it automically creates an index on the email field
+- unique to be true in mongoose schema ensures that the email is unique and it automically creates an index on the email field
 
-  - index to be true is used to create an index on the field in the collection
+- index to be true is used to create an index on the field in the collection
 
-  - Compound index is used to create an index on multiple fields in the collection in mongoose schema. To create a compound index, pass an array of fields to the index key in the schema. For example, to create a compound index on the fromUserId and toUserId fields in the user collection, use the following code:
-    **connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 })**
+- Compound index is used to create an index on multiple fields in the collection in mongoose schema. To create a compound index, pass an array of fields to the index key in the schema. For example, to create a compound index on the fromUserId and toUserId fields in the user collection, use the following code:
+  **connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 })**
 
-  - If there are millions of records in the collection and we want to search by fromUserId and toUserId then we can create a compound index on fromUserId and toUserId to make the search faster.
+- If there are millions of records in the collection and we want to search by fromUserId and toUserId then we can create a compound index on fromUserId and toUserId to make the search faster.
 
-  - Creating index on every field of the schema not recommended because it slows down the write operation and increases the size of the index file on the disk which can slow down the read operation as well as the index file is loaded in the memory for faster read operation and if the index file is large then it will take more time to load the index file in the memory which will slow down the read operation as well as the write operation. So, it is recommended to create index on the fields which are used in the query for filtering the data.
+- Creating index on every field of the schema not recommended because it slows down the write operation and increases the size of the index file on the disk which can slow down the read operation as well as the index file is loaded in the memory for faster read operation and if the index file is large then it will take more time to load the index file in the memory which will slow down the read operation as well as the write operation. So, it is recommended to create index on the fields which are used in the query for filtering the data.
 
 ## Connection Request's Review API
-  - **"/request/send/:status/:requestId"**
-    1. Check the status type is valid or not, either **accepted or rejected**
-    2. Check the **requestId** is valid or not and the request is in **interested** status and **toUserId** is the logged in user
-      ```javascript
-         // check the status type is valid or not
-        const allowedStatus = ["accepted", "rejected"];
-        if (!allowedStatus.includes(status)) {
-          throw new Error("Invalid status type: " + status);
-        }
 
-        // check the requestId is valid or not and the request is in interested status and toUserId is the logged in user
-        const connectionRequest = await ConnectionRequest.findOne({
-          _id: requestId,
-          toUserId: loggedInUser._id,
-          status: "interested",
-        });
-      ```
-  
+- **"/request/send/:status/:requestId"**
+
+  1. Check the status type is valid or not, either **accepted or rejected**
+  2. Check the **requestId** is valid or not and the request is in **interested** status and **toUserId** is the logged in user
+
+  ```javascript
+  // check the status type is valid or not
+  const allowedStatus = ["accepted", "rejected"];
+  if (!allowedStatus.includes(status)) {
+    throw new Error("Invalid status type: " + status);
+  }
+
+  // check the requestId is valid or not and the request is in interested status and toUserId is the logged in user
+  const connectionRequest = await ConnectionRequest.findOne({
+    _id: requestId,
+    toUserId: loggedInUser._id,
+    status: "interested",
+  });
+  ```
+
+## User Router API'S & ref
+
+  - **/user/requests/received**
+
+    - Get all pending connection request for the loggedIn user in which status to be interested
+    - Find all the connection requests where the loggedIn user is the toUserId and status is interested
+    - But now We will get only the fromUserId , toUserId and status fields in the connectionRequests but we want to get the firstName, lastName, age, gender, about detailsetc of the fromUserId as well.
+    - So we will use **ref** to populate the fromUserId field with the details from the User model
+    - **ref** is used to make reference to the different model , to determine the foreign collection it should query to get the required details associate with that id.
+    ```javascript
+      // connectionRequest.js
+      const connectionRequestSchema = new mongoose.Schema(
+        {
+          fromUserId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User", // Reference to User model to populate the user details
+            required: true,
+          }
+        }
+      );
+
+    ```
+    - Populate the fromUserId field with required fields from the User model , First parameter is the field name and second parameter is the fields to be populated
+    ```javascript
+      const connectionRequests = await connectionRequest.find({
+        toUserId: loggedInUser._id,
+        status: "interested"
+      }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "age", "gender", "about", "skills"]);
+      // .populate("fromUserId", "firstName lastName"); It also works same as above
+    ```
