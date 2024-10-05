@@ -72,6 +72,10 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 userRouter.get("/user/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 100 ? 100 : limit;
+    const skip = (page - 1) * limit;
 
     // Find all connection request (sent + received)
     const connectionRequests = await ConnectionRequest.find({
@@ -91,8 +95,12 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
         { _id: { $nin: Array.from(hideUsersFromFeed) } },
         { _id: { $ne: loggedInUser._id } },
       ],
-    }).select(USER_SAFE_DATA);
+    }).select(USER_SAFE_DATA).skip(skip).limit(limit);
+
     // .select(["firstName", "lastName", "photoUrl", "age", "gender", "about", "skills",]) use to particular key/fields from the document/object
+    // .skip() use to skip the number of documents from the collection
+    // .limit() use to limit the number of documents to be fetched from the collection
+
 
     res.send(users);
   } catch (error) {

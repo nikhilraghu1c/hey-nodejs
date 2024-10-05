@@ -891,6 +891,7 @@ app.patch("/user/:userId", async (req, res) => {
 - **/user/feed**
 
   - Get all the profile of other users on the platform
+
     ```javascript
     userRouter.get("/user/feed", userAuth, async (req, res) => {
       try {
@@ -898,7 +899,10 @@ app.patch("/user/:userId", async (req, res) => {
 
         // Find all connection request (sent + received)
         const connectionRequests = await ConnectionRequest.find({
-          $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+          $or: [
+            { fromUserId: loggedInUser._id },
+            { toUserId: loggedInUser._id },
+          ],
         }).select(["fromUserId", "toUserId"]);
 
         // Create a set which store all the fromUserId and toUserId enteries from the connection requests collection.
@@ -923,4 +927,25 @@ app.patch("/user/:userId", async (req, res) => {
       }
     });
     ```
-  - Adding Pagination in the feed API
+
+  - **Adding Pagination in the feed API**
+    - **"/user/feed?page=1&limit=10"**
+    - To add pagination in the feed api, we will use .skip() & .limit() method given by mongodb
+    - .skip() use to skip the number of documents from the collection
+    - .limit() use to limit the number of documents to be fetched from the collection
+
+      ```javascript
+      const page = parseInt(req.query.page) || 1;
+      let limit = parseInt(req.query.limit) || 10;
+      limit = limit > 100 ? 100 : limit;
+      const skip = (page - 1) * limit;
+      const users = await User.find({
+        $and: [
+          { _id: { $nin: Array.from(hideUsersFromFeed) } },
+          { _id: { $ne: loggedInUser._id } },
+        ],
+      })
+        .select(["firstName", "lastName", "photoUrl", "age", "gender", "about", "skills"])
+        .skip(skip)
+        .limit(limit);
+      ```
