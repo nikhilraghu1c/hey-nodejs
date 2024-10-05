@@ -815,31 +815,75 @@ app.patch("/user/:userId", async (req, res) => {
 
 ## User Router API'S & ref
 
-  - **/user/requests/received**
+- **/user/requests/received**
 
-    - Get all pending connection request for the loggedIn user in which status to be interested
-    - Find all the connection requests where the loggedIn user is the toUserId and status is interested
-    - But now We will get only the fromUserId , toUserId and status fields in the connectionRequests but we want to get the firstName, lastName, age, gender, about detailsetc of the fromUserId as well.
-    - So we will use **ref** to populate the fromUserId field with the details from the User model
-    - **ref** is used to make reference to the different model , to determine the foreign collection it should query to get the required details associate with that id.
+  - Get all pending connection request for the loggedIn user in which status to be interested
+  - Find all the connection requests where the loggedIn user is the toUserId and status is interested
+  - But now We will get only the fromUserId , toUserId and status fields in the connectionRequests but we want to get the firstName, lastName, age, gender, about detailsetc of the fromUserId as well.
+  - So we will use **ref** to populate the fromUserId field with the details from the User model
+  - **ref** is used to make reference to the different model , to determine the foreign collection it should query to get the required details associate with that id.
+
+  ```javascript
+  // connectionRequest.js
+  const connectionRequestSchema = new mongoose.Schema({
+    fromUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to User model to populate the user details
+      required: true,
+    },
+  });
+  ```
+
+  - Populate the fromUserId field with required fields from the User model , First parameter is the field name and second parameter is the fields to be populated
+
+  ```javascript
+  const connectionRequests = await connectionRequest
+    .find({
+      toUserId: loggedInUser._id,
+      status: "interested",
+    })
+    .populate("fromUserId", [
+      "firstName",
+      "lastName",
+      "photoUrl",
+      "age",
+      "gender",
+      "about",
+      "skills",
+    ]);
+  // .populate("fromUserId", "firstName lastName"); It also works same as above
+  ```
+
+- **/user/connections**
+
+  - Get all connection which is accepted from the end user or the current user
+  - All the connection request where loggedInUser if the fromUserId or toUserId & status is accepted
+  - Populate the fromUserId & toUserId to get the User details
+
     ```javascript
-      // connectionRequest.js
-      const connectionRequestSchema = new mongoose.Schema(
-        {
-          fromUserId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User", // Reference to User model to populate the user details
-            required: true,
-          }
-        }
-      );
-
+    const connectionRequests = await connectionRequest
+      .find({
+        $or: [
+          { fromUserId: loggedInUser._id, status: "accepted" },
+          { toUserId: loggedInUser._id, status: "accepted" },
+        ],
+      })
+      .populate("fromUserId", USER_SAFE_DATA)
+      .populate("toUserId", USER_SAFE_DATA);
     ```
-    - Populate the fromUserId field with required fields from the User model , First parameter is the field name and second parameter is the fields to be populated
+
+  - Get the user details based on the current user id is fromUserId or toUserId. If the current user id is fromUserId then get the toUserId details and vice versa.
+
     ```javascript
-      const connectionRequests = await connectionRequest.find({
-        toUserId: loggedInUser._id,
-        status: "interested"
-      }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "age", "gender", "about", "skills"]);
-      // .populate("fromUserId", "firstName lastName"); It also works same as above
+    const data = connectionRequests.map((row) => {
+      if (row.fromUserId._id.equals(loggedInUser._id)) {
+        return row.toUserId;
+      }
+      return row.fromUserId;
+    });
+
+    res.json({
+      message: "Data fetched successfully",
+      data: data,
+    });
     ```
