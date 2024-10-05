@@ -887,3 +887,40 @@ app.patch("/user/:userId", async (req, res) => {
       data: data,
     });
     ```
+
+- **/user/feed**
+
+  - Get all the profile of other users on the platform
+    ```javascript
+    userRouter.get("/user/feed", userAuth, async (req, res) => {
+      try {
+        const loggedInUser = req.user;
+
+        // Find all connection request (sent + received)
+        const connectionRequests = await ConnectionRequest.find({
+          $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+        }).select(["fromUserId", "toUserId"]);
+
+        // Create a set which store all the fromUserId and toUserId enteries from the connection requests collection.
+        const hideUsersFromFeed = new Set();
+        connectionRequests.forEach((item) => {
+          hideUsersFromFeed.add(item.fromUserId.toString());
+          hideUsersFromFeed.add(item.toUserId.toString());
+        });
+
+        // Get user which is not present in the hideUsersFromFeed Set using $and, $nin (not in), $ne (not equals to)
+        const users = await User.find({
+          $and: [
+            { _id: { $nin: Array.from(hideUsersFromFeed) } },
+            { _id: { $ne: loggedInUser._id } },
+          ],
+        }).select(USER_SAFE_DATA);
+        // .select(["firstName", "lastName", "photoUrl", "age", "gender", "about", "skills",]) use to particular key/fields from the document/object
+
+        res.send(users);
+      } catch (error) {
+        res.status(400).send("Error: " + error.message);
+      }
+    });
+    ```
+  - Adding Pagination in the feed API
