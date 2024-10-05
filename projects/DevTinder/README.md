@@ -718,28 +718,30 @@ app.patch("/user/:userId", async (req, res) => {
 
 - For logout api, just need to clear the cookie by res.clearCookie("token").
 - If you want to send the JSON in the api response then you can use **res.json()** method instead of **res.send()** method. **example: res.json({message: "User logged in successfully", data: user})**.
-- Instead of validate in the schema , we can also define enum for the fixed value type
 
-```javascript
-  "gender": {
-    type: String,
-    enum: {
-      values: ["male", "female", "other"],
-      message: `{VALUE} is incorrect gender type`,
-    },
-    validate(value) {
-    // this is a custom validator to validate the gender , works same as enum
-      if (!["male", "female", "others"].includes(value)) {
-        throw new Error("Gender data is invalid!!");
-      }
-    },
-  },
-```
+  **NOTE:-**Instead of validate in the schema , we can also define enum for the fixed value type
 
-## Connection Request's API
+  ```javascript
+    "gender": {
+      type: String,
+      enum: {
+        values: ["male", "female", "other"],
+        message: `{VALUE} is incorrect gender type`,
+      },
+      validate(value) {
+      // this is a custom validator to validate the gender , works same as enum
+        if (!["male", "female", "others"].includes(value)) {
+          throw new Error("Gender data is invalid!!");
+        }
+      },
+    },
+  ```
+
+## Connection Request's Send API
 
 - Need to create a new schema for the connection request API's. We will store all this connection info into the different collection.
 - Created new Schema **connectionRequestSchema** in the models **"connectionRequest.js"**.
+
 - **"/request/send/:status/:toUserId"**
 
   - Condition Needs to check before saving the [ignored, interested] status between two user.
@@ -788,3 +790,23 @@ app.patch("/user/:userId", async (req, res) => {
   - If there are millions of records in the collection and we want to search by fromUserId and toUserId then we can create a compound index on fromUserId and toUserId to make the search faster.
 
   - Creating index on every field of the schema not recommended because it slows down the write operation and increases the size of the index file on the disk which can slow down the read operation as well as the index file is loaded in the memory for faster read operation and if the index file is large then it will take more time to load the index file in the memory which will slow down the read operation as well as the write operation. So, it is recommended to create index on the fields which are used in the query for filtering the data.
+
+## Connection Request's Review API
+  - **"/request/send/:status/:requestId"**
+    1. Check the status type is valid or not, either **accepted or rejected**
+    2. Check the **requestId** is valid or not and the request is in **interested** status and **toUserId** is the logged in user
+      ```javascript
+         // check the status type is valid or not
+        const allowedStatus = ["accepted", "rejected"];
+        if (!allowedStatus.includes(status)) {
+          throw new Error("Invalid status type: " + status);
+        }
+
+        // check the requestId is valid or not and the request is in interested status and toUserId is the logged in user
+        const connectionRequest = await ConnectionRequest.findOne({
+          _id: requestId,
+          toUserId: loggedInUser._id,
+          status: "interested",
+        });
+      ```
+  

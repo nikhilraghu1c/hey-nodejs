@@ -52,7 +52,48 @@ requestRouter.post(
       });
       const data = await connectionRequest.save();
       res.json({
-        message:  req.user.firstName + " is " + status + " in " + toUser.firstName,
+        message:
+          req.user.firstName + " is " + status + " in " + toUser.firstName,
+        data,
+      });
+    } catch (error) {
+      res.status(400).send("Error: " + error.message);
+    }
+  }
+);
+
+/** Connection request review */
+
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const status = req.params.status;
+      const requestId = req.params.requestId;
+
+      // check the status type is valid or not
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        throw new Error("Invalid status type: " + status);
+      }
+
+      // check the requestId is valid or not and the request is in interested status and toUserId is the logged in user
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested",
+      });
+
+      if (!connectionRequest) {
+        throw new Error("Invalid Connection Request");
+      }
+
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+      res.json({
+        message: "Connection Request " + status,
         data,
       });
     } catch (error) {
