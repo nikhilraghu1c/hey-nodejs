@@ -54,3 +54,20 @@ Currently, two official plugins are available:
          return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
        }
        ```
+
+- Install Daisy UI
+
+  - **DaisyUi:** component library for Tailwind CSS
+  - Provide many component which is compatible with tailwindcss
+
+  - Configure Daisy UI with projects
+    **https://daisyui.com/docs/install**
+
+    1. npm install -D daisyui
+    2. Add daisyUI to tailwind.config.js:
+       ```javascript
+       module.exports = {
+         //...
+         plugins: [require("daisyui")],
+       };
+       ```
