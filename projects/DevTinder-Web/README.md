@@ -74,6 +74,7 @@ Currently, two official plugins are available:
 
 - Create a New file for different section like navbar.
 - Install **react-router-dom** for defining the routes.
+
   ```javascript
   import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -85,6 +86,48 @@ Currently, two official plugins are available:
             <Route path="/" element={<h1>Base Page</h1>} />
             <Route path="/login" element={<h1>Login Page</h1>} />
             <Route path="/test" element={<h1>Test Page</h1>} />
+          </Routes>
+        </BrowserRouter>
+      </>
+    );
+  }
+
+  export default App;
+  ```
+
+- Now to systemically define the routes, First need to create a body component **Body.jsx** which is parent routes.
+- Body component will be open on default route **"/"** & also define **</Outlet** inside it so children component will also open inside it.
+
+  ```javascript
+  import { Outlet } from "react-router-dom";
+  import NavBar from "./NavBar";
+  import Footer from "./Footer";
+
+  const Body = () => {
+    return (
+      <div>
+        <NavBar />
+        <Outlet />
+        <Footer />
+      </div>
+    );
+  };
+
+  export default Body;
+  ```
+
+- Now define the routes in the **App.jsx** component which also includes the child routes
+
+  ```javascript
+  function App() {
+    return (
+      <>
+        <BrowserRouter basename="/">
+          <Routes>
+            <Route path="/" element={<Body />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </>
