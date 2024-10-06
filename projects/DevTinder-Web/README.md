@@ -57,7 +57,7 @@ Currently, two official plugins are available:
 
 - Install Daisy UI
 
-  - **DaisyUi:** component library for Tailwind CSS
+  - **DaisyUI:** component library for Tailwind CSS
   - Provide many component which is compatible with tailwindcss
 
   - Configure Daisy UI with projects
@@ -71,3 +71,25 @@ Currently, two official plugins are available:
          plugins: [require("daisyui")],
        };
        ```
+
+- Create a New file for different section like navbar.
+- Install **react-router-dom** for defining the routes.
+  ```javascript
+  import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+  function App() {
+    return (
+      <>
+        <BrowserRouter basename="/">
+          <Routes>
+            <Route path="/" element={<h1>Base Page</h1>} />
+            <Route path="/login" element={<h1>Login Page</h1>} />
+            <Route path="/test" element={<h1>Test Page</h1>} />
+          </Routes>
+        </BrowserRouter>
+      </>
+    );
+  }
+
+  export default App;
+  ```
