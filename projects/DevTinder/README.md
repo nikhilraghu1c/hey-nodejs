@@ -929,6 +929,7 @@ app.patch("/user/:userId", async (req, res) => {
     ```
 
   - **Adding Pagination in the feed API**
+
     - **"/user/feed?page=1&limit=10"**
     - To add pagination in the feed api, we will use .skip() & .limit() method given by mongodb
     - .skip() use to skip the number of documents from the collection
@@ -945,7 +946,45 @@ app.patch("/user/:userId", async (req, res) => {
           { _id: { $ne: loggedInUser._id } },
         ],
       })
-        .select(["firstName", "lastName", "photoUrl", "age", "gender", "about", "skills"])
+        .select([
+          "firstName",
+          "lastName",
+          "photoUrl",
+          "age",
+          "gender",
+          "about",
+          "skills",
+        ])
         .skip(skip)
         .limit(limit);
       ```
+
+# CORS
+
+- Now when you hit the backend api then **CORS** will occur because your backend and UI port is different. (**localhost === 127.0.0.1**)
+- To solve the cors error, need to install external library **cors (npm install cors)** in the backend (nodejs) & add middleware in the app.js
+  ```javascript
+  // in the backend file app.js
+  app.use(cors());
+  ```
+- Now API will work but For http or localhost, cookies will not set. Cookies only set when origin and the server is https. So to set the cookies need to whitelist the URL in the backend.
+  ```javascript
+  app.use(
+    cors({
+      origin: "http://localhost:5173", // origin is the URL of the frontend application that you want to allow to access your API
+      credentials: true, // credentials is set to true to allow the frontend to send cookies
+    })
+  );
+  ```
+
+- And IN UI , need to send the withCredentials to be true as options when hitting the api.
+  ```javascript
+  axios.post(
+    "http://localhost:7777/login",
+    {
+      emailId,
+      password,
+    },
+    { withCredentials: true }
+  );
+  ```

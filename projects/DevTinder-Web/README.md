@@ -136,3 +136,38 @@ Currently, two official plugins are available:
 
   export default App;
   ```
+
+# Start Building The UI Components with API
+
+### Login Page Implementation
+
+- Create a login page html using DaisyUI
+- Also Add react useState hook and click event using js.
+- For hitting API Call we will gonna use **axios** external library (**npm i axios**).
+- Now when you hit the backend api then **CORS** will occur because your backend and UI port is different. (**localhost === 127.0.0.1**)
+- To solve the cors error, need to install external library **cors (npm install cors)** in the backend (nodejs) & add middleware in the app.js
+  ```javascript
+  // in the backend file app.js
+  app.use(cors());
+  ```
+- Now API will work but For http or localhost, cookies will not set. Cookies only set when origin and the server is https. So to set the cookies need to whitelist the URL in the backend.
+  ```javascript
+  app.use(
+    cors({
+      origin: "http://localhost:5173", // origin is the URL of the frontend application that you want to allow to access your API
+      credentials: true, // credentials is set to true to allow the frontend to send cookies
+    })
+  );
+  ```
+
+- And IN UI , need to send the withCredentials to be true as options when hitting the api.
+  ```javascript
+  axios.post(
+    "http://localhost:7777/login",
+    {
+      emailId,
+      password,
+    },
+    { withCredentials: true }
+  );
+  ```

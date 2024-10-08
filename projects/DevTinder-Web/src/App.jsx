@@ -1,6 +1,6 @@
 import Body from "./Body";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./login";
+import Login from "./Login";
 import Profile from "./Profile";
 
 function App() {
