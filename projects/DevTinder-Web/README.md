@@ -151,6 +151,7 @@ Currently, two official plugins are available:
   app.use(cors());
   ```
 - Now API will work but For http or localhost, cookies will not set. Cookies only set when origin and the server is https. So to set the cookies need to whitelist the URL in the backend.
+
   ```javascript
   app.use(
     cors({
@@ -170,4 +171,105 @@ Currently, two official plugins are available:
     },
     { withCredentials: true }
   );
+  ```
+
+### React Redux
+
+- Redux is an open-source JavaScript library for managing and centralizing application state.
+- https://redux-toolkit.js.org/tutorials/quick-start
+- **npm install @reduxjs/toolkit react-redux**
+- Create a file named **src/utils/appStore.js**. Import the configureStore API from Redux Toolkit. We'll start by creating an empty Redux store, and exporting it. This creates a Redux store, and also automatically configure the Redux DevTools extension so that you can inspect the store while developing. we can install **redux-devtools** extension in chrome to see store values.
+
+  ```javascript
+  import { configureStore } from "@reduxjs/toolkit";
+
+  const appStore = configureStore({
+    reducer: {},
+  });
+
+  export default appStore;
+  ```
+
+- Once the store is created, we can make it available to our React components by putting a React-Redux <Provider> around our application in src/App.jsx. Import the Redux store we just created, put a <Provider> around your <BrowserRouter>, and pass the store as a prop:
+
+  ```javascript
+  import { Provider } from "react-redux";
+  import appStore from "./utils/appStore";
+
+  function App() {
+    return (
+      <>
+        <Provider store={appStore}>
+          <BrowserRouter basename="/">
+            <Routes>
+              <Route path="/" element={<Body />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/profile" element={<Profile />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </Provider>
+      </>
+    );
+  }
+  ```
+
+- Add a new file named src/utils/userSlice.js. In that file, import the createSlice API from Redux Toolkit.
+- Creating a slice requires a string name to identify the slice, an initial state value, and one or more reducer functions to define how the state can be updated. Once a slice is created, we can export the generated Redux action creators and the reducer function for the whole slice.
+- Redux requires that we write all state updates immutably, by making copies of data and updating the copies. However, Redux Toolkit's createSlice and createReducer APIs use Immer inside to allow us to write "mutating" update logic that becomes correct immutable updates.
+
+  ```javascript
+  import { createSlice } from "@reduxjs/toolkit";
+
+  const userSlice = createSlice({
+    name: "user",
+    initialState: null,
+    reducers: {
+      addUser: (state, action) => {
+        return action.payload;
+      },
+      removeUser: (state, action) => {
+        return null;
+      },
+    },
+  });
+
+  export const { addUser, removeUser } = userSlice.actions;
+  export default userSlice.reducer;
+  ```
+
+- Next, we need to import the reducer function from the user slice and add it to our store (**/appStore.js**). By defining a field inside the reducer parameter, we tell the store to use this slice reducer function to handle all updates to that state.
+
+  ```javascript
+  import { configureStore } from "@reduxjs/toolkit";
+  import userReducer from "./userSlice";
+
+  const appStore = configureStore({
+    reducer: {
+      user: userReducer,
+    },
+  });
+
+  export default appStore;
+  ```
+
+- Now we can use the React-Redux hooks to let React components interact with the Redux store. We can read data when we get the successfull response from login api and dispatch actions using useDispatch and set the data in the store.
+
+  ```javascript
+    // Login.jsx component
+    import { useDispatch } from "react-redux";
+    import { addUser } from "./utils/userSlice";
+
+    const Login = () => {
+      const dispatch = useDispatch();
+
+      const handleLogin = async () => {
+        try {
+          const res = await axios.post(...);
+          dispatch(addUser(res.data));
+        } catch (error) {
+          console.error(error);
+        }
+      };
+    };
   ```
