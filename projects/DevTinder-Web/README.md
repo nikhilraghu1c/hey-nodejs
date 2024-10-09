@@ -273,3 +273,25 @@ Currently, two official plugins are available:
       };
     };
   ```
+
+- Now after setting up the Redux store (set the user data), we can access the user data from the store using the useSelector hook in any component.
+- **useSelector** is a hook from react-redux that allows you to extract data from the Redux store state, using a selector function.
+- In this navbar, we are using useSelector to get the user data from the store and display it in the navbar like user firstName & user photo.
+  ```javascript
+    // ./NavBar.jsx
+    import { useSelector } from "react-redux";
+    const NavBar = () => {
+      const user = useSelector((store) => store.user);
+      return (
+        ...
+          {user && (
+            <div className="flex-none gap-2">
+              <div className="form-control">Welcome, {user.firstName}</div>
+                ...
+              </div>
+          )}
+        ...
+      );
+    };
+    export default NavBar;
+  ```
