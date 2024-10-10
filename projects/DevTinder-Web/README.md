@@ -308,9 +308,25 @@ Currently, two official plugins are available:
     navigate("/login");
   ```
 
--  The fetchUser function in **Body.jsx** is used to fetch the user data from the backend and store it in the Redux store and also redirect to the login page if the user is not authenticated. if user data is already present in the store then return from here and don't fetch it again.
+- The fetchUser function in **Body.jsx** is used to fetch the user data from the backend and store it in the Redux store and also redirect to the login page if the user is not authenticated. if user data is already present in the store then return from here and don't fetch it again.
 
 - **Implement Logout Feature:**
+
   1. Call the logout api from the navbar logout button click
   2. Clear the user data from the store by using **dispatch(removeUser())**.
   3. navigate to the login page using useNavigate().
+
+- **Strict Mode:**
+  1. React Strict Mode is a development tool that helps identify potential bugs and issues in a React application's code. It does this by running additional checks and warnings during rendering.
+  2. Here are some things that React Strict Mode can help with: Identifying components with unsafe lifecycles, Detecting unexpected side effects, Warning about legacy string ref API usage, Warning about deprecated findDOMNode usage, and Ensuring reusable state.
+  3. To enable Strict Mode in a React application, you can wrap your entire application or specific components in the <React.StrictMode> component.
+  4. Strict Mode checks are only run in development mode and do not impact the production build. It does not render any visible UI.
+
+  ```javascript
+    // main.jsx
+    createRoot(document.getElementById('root')).render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    )
+  ```

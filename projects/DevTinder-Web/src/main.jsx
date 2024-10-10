@@ -4,7 +4,9 @@ import App from './App.jsx'
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <App />
-  </StrictMode>,
+  // </StrictMode>,
 )
+
+// strict mode is used to identify unsafe lifecycle methods and warn about them in development mode
