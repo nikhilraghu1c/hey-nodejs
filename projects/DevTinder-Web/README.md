@@ -309,3 +309,8 @@ Currently, two official plugins are available:
   ```
 
 -  The fetchUser function in **Body.jsx** is used to fetch the user data from the backend and store it in the Redux store and also redirect to the login page if the user is not authenticated. if user data is already present in the store then return from here and don't fetch it again.
+
+- **Implement Logout Feature:**
+  1. Call the logout api from the navbar logout button click
+  2. Clear the user data from the store by using **dispatch(removeUser())**.
+  3. navigate to the login page using useNavigate().
