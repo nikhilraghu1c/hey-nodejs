@@ -295,3 +295,17 @@ Currently, two official plugins are available:
     };
     export default NavBar;
   ```
+
+### Phase 2 Of UI Implementation
+
+- useNavigate is a hook from react-router-dom that returns a navigate function that can be used to navigate to different routes.
+
+  ```javascript
+    import { useNavigate } from "react-router-dom";
+    ...
+    const navigate = useNavigate();
+    ...
+    navigate("/login");
+  ```
+
+-  The fetchUser function in **Body.jsx** is used to fetch the user data from the backend and store it in the Redux store and also redirect to the login page if the user is not authenticated. if user data is already present in the store then return from here and don't fetch it again.
