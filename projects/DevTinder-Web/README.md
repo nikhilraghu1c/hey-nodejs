@@ -330,3 +330,6 @@ Currently, two official plugins are available:
       </StrictMode>,
     )
   ```
+
+- **Implement User Card Template**
+  - Create one **UserCard.jsx** file and by using daisyui build the template for the user card and use that user card in the feed page.
