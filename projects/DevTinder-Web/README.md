@@ -331,5 +331,11 @@ Currently, two official plugins are available:
     )
   ```
 
-- **Implement User Card Template**
-  - Create one **UserCard.jsx** file and by using daisyui build the template for the user card and use that user card in the feed page.
+- **Implement User Card Template:** Create one **UserCard.jsx** file and by using daisyui build the template for the user card and use that user card in the feed page.
+
+- **Implement Edit LoggedInUser Profile:-**
+  1. Create new file **EditProfile.jsx** and add it in the **Profile.jsx** then it will show when user click on profile.
+  2. From **Profile.jsx**, get user data from store and show current user values in the fields.
+  3. Now implement the **/profile/edit** api to update the user profile with new values and also update the user store value.
+  4. Also add **User Card Template** to show how it looks in another user feed page.
+  5. Also show the notification when profile updated successfully.
