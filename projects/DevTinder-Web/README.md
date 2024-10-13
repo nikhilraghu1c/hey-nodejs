@@ -339,3 +339,5 @@ Currently, two official plugins are available:
   3. Now implement the **/profile/edit** api to update the user profile with new values and also update the user store value.
   4. Also add **User Card Template** to show how it looks in another user feed page.
   5. Also show the notification when profile updated successfully.
+
+- **Implement Connections Page:** Create one **Connections.jsx** file to show all the connections and implement **/user/connections** api to get the connections list.
