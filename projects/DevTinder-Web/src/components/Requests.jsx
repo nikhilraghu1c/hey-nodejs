@@ -17,6 +17,25 @@ const Requests = () => {
     }
   };
 
+  const reviewRequest = async (status, requestId) => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/request/review/" + status + "/" + requestId,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      removeRequest(requestId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const removeRequest = (requestId) => {
+    setRequests((item) => item.filter((request) => request._id !== requestId));
+  };
+
   useEffect(() => {
     fetchRequests();
   }, []);
@@ -49,8 +68,22 @@ const Requests = () => {
               <p>{about}</p>
             </div>
             <div>
-              <button className="btn btn-outline btn-success mx-2">Accept</button>
-              <button className="btn btn-outline btn-error mx-2">Reject</button>
+              <button
+                className="btn btn-outline btn-success mx-2"
+                onClick={() => {
+                  reviewRequest("accepted", request._id);
+                }}
+              >
+                Accept
+              </button>
+              <button
+                className="btn btn-outline btn-error mx-2"
+                onClick={() => {
+                  reviewRequest("rejected", request._id);
+                }}
+              >
+                Reject
+              </button>
             </div>
           </div>
         );

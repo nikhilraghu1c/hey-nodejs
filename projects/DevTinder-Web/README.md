@@ -342,4 +342,4 @@ Currently, two official plugins are available:
 
 - **Implement Connections Page:** Create one **Connections.jsx** file to show all the connections and implement **/user/connections** api to get the connections list.
 
-- **Implement Connection Requests Page:** Create one **Requests.jsx** file to show all the connection requests and implement **/user/requests/received** api to get the requests list. Also add 2 buttons **Accept & Reject** to accept and reject the connection requests.
+- **Implement Connection Requests Page:** Create one **Requests.jsx** file to show all the connection requests and implement **/user/requests/received** api to get the requests list. Also add 2 buttons **Accept & Reject** to accept and reject the connection requests. Also implement the api **request/review/:status/:requestId** on click of the **accept** & **reject** button and remove that request from the page.
