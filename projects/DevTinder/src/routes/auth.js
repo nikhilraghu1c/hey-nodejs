@@ -1,6 +1,9 @@
 const express = require("express");
 const User = require("../models/user");
-const { validateSignUpData, validateLoginData } = require("../utils/validation");
+const {
+  validateSignUpData,
+  validateLoginData,
+} = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const authRouter = express.Router();
 
@@ -20,8 +23,15 @@ authRouter.post("/signup", async (req, res) => {
       emailId,
       password: hashedPassword,
     });
-    await user.save();
-    res.send("User added successfully");
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 2 * 86400000),
+    });
+    res.json({
+      message: "User added successfully",
+      data: savedUser,
+    });
   } catch (err) {
     res.status(400).send("ERROR:" + err.message);
   }

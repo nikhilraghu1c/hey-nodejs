@@ -345,3 +345,9 @@ Currently, two official plugins are available:
 - **Implement Connection Requests Page:** Create one **Requests.jsx** file to show all the connection requests and implement **/user/requests/received** api to get the requests list. Also add 2 buttons **Accept & Reject** to accept and reject the connection requests. Also implement the api **request/review/:status/:requestId** on click of the **accept** & **reject** button and remove that request from the page.
 
 - **Implement API for Feed Page for Ignored or Interested (/request/send/:status/:userId) & After api response remove that user from feed store**
+
+- **Implement SignUp Page:-** 
+  1. Implement the **SignUp** page in the same page with **Login.jsx** and design the UI.
+  2. Implement the **Signup API /signup** on click of signup button.
+  3. After signup api is successful then it will be autologin and navigate to **/profile** page.
+  4. To make it autologin, we have to update the backend code and also set the cookies when **/signup** api hits (Same implementation as when we hit **/login** api).  
