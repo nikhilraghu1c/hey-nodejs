@@ -52,6 +52,9 @@ const NavBar = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/">Feed</Link>
+              </li>
+              <li>
                 <Link to="/connections">Connections</Link>
               </li>
               <li>

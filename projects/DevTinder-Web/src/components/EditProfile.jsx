@@ -108,7 +108,12 @@ const EditProfile = ({ user }) => {
                     value={about}
                     className="input input-bordered w-full max-w-xs"
                     onChange={(e) => setAbout(e.target.value)}
+                    maxLength={50}
                   />
+                  <div className="label">
+                    <span className="label-text-alt"></span>
+                    <span className="label-text-alt">{about?.length + " / 50"}</span>
+                  </div>
                 </label>
                 <label className="form-control w-full max-w-xs my-2">
                   <div className="label">
