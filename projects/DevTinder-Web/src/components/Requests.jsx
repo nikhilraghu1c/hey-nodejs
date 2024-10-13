@@ -67,7 +67,7 @@ const Requests = () => {
               {age && gender && <p>{age + ", " + gender}</p>}
               <p>{about}</p>
             </div>
-            <div>
+            <div className="flex-1 text-end">
               <button
                 className="btn btn-outline btn-success mx-2"
                 onClick={() => {
