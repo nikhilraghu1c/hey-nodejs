@@ -341,3 +341,5 @@ Currently, two official plugins are available:
   5. Also show the notification when profile updated successfully.
 
 - **Implement Connections Page:** Create one **Connections.jsx** file to show all the connections and implement **/user/connections** api to get the connections list.
+
+- **Implement Connection Requests Page:** Create one **Requests.jsx** file to show all the connection requests and implement **/user/requests/received** api to get the requests list. Also add 2 buttons **Accept & Reject** to accept and reject the connection requests.
