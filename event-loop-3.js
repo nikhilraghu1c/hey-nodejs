@@ -38,6 +38,7 @@ console.log("Last line of the script");
  * Last line of the script
  * process.nextTick
  * Promise 1
+ * setTimeout
  * setImmediate
  * File reading completed
  * process.nextTick inside readFile

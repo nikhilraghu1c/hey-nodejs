@@ -289,6 +289,7 @@ Just to learn the nodejs all concepts
       * Last line of the script
       * process.nextTick
       * Promise 1
+      * setTimeout
       * setImmediate
       * File reading completed
       * process.nextTick inside readFile
